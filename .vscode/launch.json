@@ -1,0 +1,22 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "STM32 Debug",
+            "type": "cortex-debug",
+            "request": "launch",
+
+            "servertype": "stlink",
+
+            "cwd": "${workspaceFolder}",
+
+            "executable": "${workspaceFolder}/build/Debug/Mereni_hladiny.elf",
+
+            "device": "STM32WLE55CC",
+
+            "runToEntryPoint": "main",
+
+            "preLaunchTask": "build"
+        }
+    ]
+}

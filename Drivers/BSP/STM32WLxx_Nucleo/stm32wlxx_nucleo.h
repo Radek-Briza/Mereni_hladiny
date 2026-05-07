@@ -27,6 +27,8 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32wlxx_nucleo_errno.h"
 #include "stm32wlxx_nucleo_conf.h"
+
+//#define USE_BSP_COM_FEATURE  1
    
 #if (USE_BSP_COM_FEATURE == 1)
 #include "stdio.h"
@@ -349,4 +351,5 @@ HAL_StatusTypeDef MX_LPUART1_Init(UART_HandleTypeDef *huart, MX_UART_InitTypeDef
 }
 #endif
 
+//#define COM_WORDLENGTH_8B  0
 #endif /* STM32WLXX_NUCLEO_H */

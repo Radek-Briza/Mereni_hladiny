@@ -17,15 +17,21 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
-#include "main.h"
+
+#include "main.h"  
 #include "sys_app.h"
 #include "app_subghz_phy.h"
 #include "tim.h"
 #include "wwdg.h"
 #include "gpio.h"
-#include "stm32wlxx_nucleo.h" 
+#include "stm32wlxx_nucleo.h"  
+#include <stdio.h>
  
 
+
+#ifdef __GNUC__
+#pragma message "GNUC OK" 
+#endif
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -71,7 +77,7 @@ void SystemClock_Config(void);
   * @brief  The application entry point.
   * @retval int
   */
-int main(void)
+int main(void)  
 {
 
   /* USER CODE BEGIN 1 */
@@ -102,7 +108,7 @@ int main(void)
   MX_TIM1_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
-  App Aplication;
+  App Application;
   /* USER CODE END 2 */
 
   /* Initialize leds */
@@ -127,13 +133,13 @@ int main(void)
   }
 
 
-  printf("\rMereni hladiny ver 1.01 \r\n");
+  printf("\rMereni hladiny ver 1.02 \r\n") ;
 
 
   //puts("puts HELLO\r");
   /* Infinite loop */
-  Aplication.init();
-  Aplication.loop();
+  Application.init();
+  Application.loop();
 
   /* USER CODE BEGIN WHILE */
   while (1)
@@ -162,7 +168,7 @@ void SystemClock_Config(void)
 
   /** Initializes the CPU, AHB and APB buses clocks
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI|RCC_OSCILLATORTYPE_LSI;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI|RCC_OSCILLATORTYPE_LSI ;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.LSIDiv = RCC_LSI_DIV1;

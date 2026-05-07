@@ -26,9 +26,8 @@
 extern "C" {
 #endif
 
-/* Includes ------------------------------------------------------------------*/
+/* Includes ------------------------------------------------------------------ Drivers\STM32WLxx_HAL_Driver\Inc\stm32wlxx_hal.h */
 #include "stm32wlxx_hal.h"
-
 #include "stm32wlxx_nucleo.h"
 #include <stdio.h>
 
@@ -36,7 +35,7 @@ extern "C" {
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
-
+;
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
 
