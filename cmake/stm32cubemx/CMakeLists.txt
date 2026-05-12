@@ -38,6 +38,7 @@ set(MX_Application_Src
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/Timer_funct.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../../App/app.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../../App/DataTransmit.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../App/Packet.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../../App/SRF05.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/main.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/gpio.c

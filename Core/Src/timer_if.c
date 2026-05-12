@@ -26,6 +26,7 @@
 #include "utilities_def.h"
 #include "stm32wlxx_ll_rtc.h"
 
+
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
@@ -270,7 +271,7 @@ uint32_t TIMER_IF_SetTimerContext(void)
 
   /* USER CODE END TIMER_IF_SetTimerContext */
 
-  TIMER_IF_DBG_PRINTF("TIMER_IF_SetTimerContext=%d\n\r", RtcTimerContext);
+ // printf("TIMER_IF_SetTimerContext=%d\n\r", RtcTimerContext);
   /*return time context*/
   return RtcTimerContext;
 }
@@ -290,7 +291,6 @@ uint32_t TIMER_IF_GetTimerElapsedTime(void)
 {
   uint32_t ret = 0;
   /* USER CODE BEGIN TIMER_IF_GetTimerElapsedTime */
-
   /* USER CODE END TIMER_IF_GetTimerElapsedTime */
   ret = ((uint32_t)(GetTimerTicks() - RtcTimerContext));
   /* USER CODE BEGIN TIMER_IF_GetTimerElapsedTime_Last */
@@ -379,7 +379,7 @@ void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
   /* USER CODE END HAL_RTC_AlarmAEventCallback */
   UTIL_TIMER_IRQ_MAP_PROCESS();
   /* USER CODE BEGIN HAL_RTC_AlarmAEventCallback_Last */
-
+ 
   /* USER CODE END HAL_RTC_AlarmAEventCallback_Last */
 }
 

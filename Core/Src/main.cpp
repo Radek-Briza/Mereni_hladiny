@@ -20,11 +20,11 @@
 
 #include "main.h"  
 #include "sys_app.h"
-#include "app_subghz_phy.h"
+#include "app_subghz_phy.h"  
 #include "tim.h"
 #include "wwdg.h"
 #include "gpio.h"
-#include "stm32wlxx_nucleo.h"  
+#include "stm32wlxx_nucleo.h"   
 #include <stdio.h>
  
 
@@ -104,7 +104,7 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
  // MX_WWDG_Init();
-  MX_SubGHz_Phy_Init();
+  //MX_SubGHz_Phy_Init();
   MX_TIM1_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
@@ -133,7 +133,7 @@ int main(void)
   }
 
 
-  printf("\rMereni hladiny ver 1.02 \r\n") ;
+  printf("\rMereni hladiny ver 1.03 \r\n") ;
 
 
   //puts("puts HELLO\r");

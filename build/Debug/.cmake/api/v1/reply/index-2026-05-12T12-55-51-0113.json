@@ -8,25 +8,25 @@
 		},
 		"paths" : 
 		{
-			"cmake" : "C:/Users/radek/AppData/Local/stm32cube/bundles/cmake/4.3.1+st.1/bin/cmake.exe",
-			"cpack" : "C:/Users/radek/AppData/Local/stm32cube/bundles/cmake/4.3.1+st.1/bin/cpack.exe",
-			"ctest" : "C:/Users/radek/AppData/Local/stm32cube/bundles/cmake/4.3.1+st.1/bin/ctest.exe",
-			"root" : "C:/Users/radek/AppData/Local/stm32cube/bundles/cmake/4.3.1+st.1/share/cmake-4.3"
+			"cmake" : "C:/Program Files/CMake/bin/cmake.exe",
+			"cpack" : "C:/Program Files/CMake/bin/cpack.exe",
+			"ctest" : "C:/Program Files/CMake/bin/ctest.exe",
+			"root" : "C:/Program Files/CMake/share/cmake-4.3"
 		},
 		"version" : 
 		{
 			"isDirty" : false,
 			"major" : 4,
 			"minor" : 3,
-			"patch" : 1,
-			"string" : "4.3.1",
+			"patch" : 2,
+			"string" : "4.3.2",
 			"suffix" : ""
 		}
 	},
 	"objects" : 
 	[
 		{
-			"jsonFile" : "codemodel-v2-5f26286da952a66dca71.json",
+			"jsonFile" : "codemodel-v2-b7ab1745c908a8704f51.json",
 			"kind" : "codemodel",
 			"version" : 
 			{
@@ -35,7 +35,7 @@
 			}
 		},
 		{
-			"jsonFile" : "cache-v2-5c7d1ee0386a6fd82ef9.json",
+			"jsonFile" : "cache-v2-30c806f19b98392faced.json",
 			"kind" : "cache",
 			"version" : 
 			{
@@ -44,7 +44,7 @@
 			}
 		},
 		{
-			"jsonFile" : "cmakeFiles-v1-9ad6e75c97faa477983a.json",
+			"jsonFile" : "cmakeFiles-v1-21a360fa9d836903c03b.json",
 			"kind" : "cmakeFiles",
 			"version" : 
 			{
@@ -90,7 +90,7 @@
 				"responses" : 
 				[
 					{
-						"jsonFile" : "cache-v2-5c7d1ee0386a6fd82ef9.json",
+						"jsonFile" : "cache-v2-30c806f19b98392faced.json",
 						"kind" : "cache",
 						"version" : 
 						{
@@ -99,7 +99,7 @@
 						}
 					},
 					{
-						"jsonFile" : "codemodel-v2-5f26286da952a66dca71.json",
+						"jsonFile" : "codemodel-v2-b7ab1745c908a8704f51.json",
 						"kind" : "codemodel",
 						"version" : 
 						{
@@ -117,7 +117,7 @@
 						}
 					},
 					{
-						"jsonFile" : "cmakeFiles-v1-9ad6e75c97faa477983a.json",
+						"jsonFile" : "cmakeFiles-v1-21a360fa9d836903c03b.json",
 						"kind" : "cmakeFiles",
 						"version" : 
 						{

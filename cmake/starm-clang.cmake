@@ -34,7 +34,7 @@ elseif (STARM_TOOLCHAIN_CONFIG STREQUAL "STARM_NEWLIB")
 endif()
 
 # MCU specific flags
-set(TARGET_FLAGS "-mcpu=cortex-m4 ${TOOLCHAIN_MULTILIBS}")
+set(TARGET_FLAGS "-mcpu=cortex-m4 -mthumb -mfpu=none -mfloat-abi=soft ${TOOLCHAIN_MULTILIBS}")
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${TARGET_FLAGS}")
 set(CMAKE_ASM_FLAGS "${CMAKE_C_FLAGS} -x assembler-with-cpp -MP")

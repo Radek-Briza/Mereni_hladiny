@@ -101,19 +101,19 @@
 			{
 				"command" : 0,
 				"file" : 0,
-				"line" : 132,
+				"line" : 133,
 				"parent" : 0
 			},
 			{
 				"command" : 1,
 				"file" : 0,
-				"line" : 134,
+				"line" : 135,
 				"parent" : 0
 			},
 			{
 				"command" : 2,
 				"file" : 0,
-				"line" : 133,
+				"line" : 134,
 				"parent" : 0
 			}
 		]
@@ -136,7 +136,7 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : " -mcpu=cortex-m4  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11"
+					"fragment" : " -mcpu=cortex-m4 -mthumb -mfloat-abi=soft  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11"
 				}
 			],
 			"defines" : 

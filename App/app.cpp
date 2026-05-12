@@ -5,18 +5,13 @@
  *      Author: radek
  */
 
-
-
 #include  "App.hpp"
 #include "stdlib.h"
 #include "SRF05.h"
 #include "Board_hw_specific.h"
-#include "Timer_funct.h"
+#include "radio.h"	
 
-extern "C" {
-
-#include "main.h"
-}
+ 
 
 SRF05 EchoDriver(SRF05_PORT[TRIGER],SRF05_PIN[TRIGER],SRF05_PORT[ECHO],SRF05_PIN[ECHO]);
 
@@ -24,9 +19,11 @@ void App::init()
 {
     // inicializace (např. periferií)
 	EchoDriver.setModeMedian(10);
-
+	DataTransmitter.Init(&Radio);
 	printf("Init device\r");
 }
+	
+
 
 void App::loop()
 {

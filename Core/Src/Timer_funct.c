@@ -16,10 +16,14 @@ void delayMicroseconds(uint16_t us){
     HAL_TIM_Base_Stop(&htim2);
 }
 
+uint32_t GetTimerTicks(void){
+	return HAL_GetTick();
+}
+
 /*
  * */
 uint32_t GetMillis(void){
-		return TIMER_IF_Convert_Tick2ms(TIMER_IF_SetTimerContext());
+	return TIMER_IF_Convert_Tick2ms(GetTimerTicks());
 }
 
 void StartCapture(void){

@@ -264,7 +264,7 @@ void RTC_Alarm_IRQHandler(void)
   /* USER CODE END RTC_Alarm_IRQn 0 */
   HAL_RTC_AlarmIRQHandler(&hrtc);
   /* USER CODE BEGIN RTC_Alarm_IRQn 1 */
-
+  //printf("RTC Alarm IRQ Handler called\r\n");
   /* USER CODE END RTC_Alarm_IRQn 1 */
 }
 
@@ -274,7 +274,7 @@ void RTC_Alarm_IRQHandler(void)
 void SUBGHZ_Radio_IRQHandler(void)
 {
   /* USER CODE BEGIN SUBGHZ_Radio_IRQn 0 */
-
+ printf("SUBGHZ Radio IRQ Handler called\r\n");
   /* USER CODE END SUBGHZ_Radio_IRQn 0 */
   HAL_SUBGHZ_IRQHandler(&hsubghz);
   /* USER CODE BEGIN SUBGHZ_Radio_IRQn 1 */

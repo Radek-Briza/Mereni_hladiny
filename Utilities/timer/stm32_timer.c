@@ -366,7 +366,7 @@ void UTIL_TIMER_IRQ_Handler( void )
 {
   UTIL_TIMER_Object_t* cur;
   uint32_t old, now, DeltaContext;
-
+  
   UTIL_TIMER_ENTER_CRITICAL_SECTION();
 
   old  =  UTIL_TimerDriver.GetTimerContext( );
@@ -392,6 +392,8 @@ void UTIL_TIMER_IRQ_Handler( void )
     } while(cur != NULL);
   }
 
+
+
   /* Execute expired timer and update the list */
   while ((TimerListHead != NULL) && ((TimerListHead->Timestamp == 0U) || (TimerListHead->Timestamp < UTIL_TimerDriver.GetTimerElapsedTime(  ))))
   {
@@ -399,6 +401,7 @@ void UTIL_TIMER_IRQ_Handler( void )
       TimerListHead = TimerListHead->Next;
       cur->IsPending = 0;
       cur->IsRunning = 0;
+    
       cur->Callback(cur->argument);
       if(( cur->Mode == UTIL_TIMER_PERIODIC) && (cur->IsReloadStopped == 0U))
       {

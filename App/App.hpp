@@ -8,12 +8,17 @@
 #ifndef APP_HPP_
 #define APP_HPP_
 
+#include  "DataTransmit.hpp"
 
 
 class App {
 public:
     void init();
     void loop();
+
+    private:
+    DataTransmit DataTransmitter; // Instance pro správu přenosu dat
+   
 };
 
 
