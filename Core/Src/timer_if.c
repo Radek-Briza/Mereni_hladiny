@@ -26,7 +26,6 @@
 #include "utilities_def.h"
 #include "stm32wlxx_ll_rtc.h"
 
-
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
@@ -271,7 +270,7 @@ uint32_t TIMER_IF_SetTimerContext(void)
 
   /* USER CODE END TIMER_IF_SetTimerContext */
 
- // printf("TIMER_IF_SetTimerContext=%d\n\r", RtcTimerContext);
+  TIMER_IF_DBG_PRINTF("TIMER_IF_SetTimerContext=%d\n\r", RtcTimerContext);
   /*return time context*/
   return RtcTimerContext;
 }

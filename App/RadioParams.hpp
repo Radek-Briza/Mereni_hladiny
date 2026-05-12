@@ -8,11 +8,11 @@
 #ifndef RADIOPARAMS_HPP_
 #define RADIOPARAMS_HPP_
 
-#define CHANNEL 865000000
+#define CHANNEL  868500000//869525000//865000000
 #define TX_POWER	5
 
-#define BANDWIDTH			0
-#define SPREED_FACTOR		6
+#define BANDWIDTH			0 // 125 kHz
+#define SPREED_FACTOR		12
 #define CODE_RATE			1
 #define PREAMBLE_LEN        1000
 #define FIX_LEN				false

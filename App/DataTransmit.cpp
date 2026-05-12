@@ -21,14 +21,11 @@ Packet DataTransmit::packet = {};
 std::array<uint8_t, Packet::max_packet_size> DataTransmit::Data = {};
 Packet::PacketType DataTransmit::DataType = Packet::Data_level;
 
-extern "C" void TimerExpiryCallback(void *context){
-	// This function will be called when the timer expires
-	// You can add any code here that you want to execute when the timer expires
-	printf("Timer expired, executing callback\n");
-}
 
-extern "C"  [[maybe_unused]] void RadioCadTimeoutIrq( void *context ){
-	DataTransmit::RadioDriver->Sleep( );
+extern "C"  [[maybe_unused]] 
+void RadioCadTimeoutIrq( void *context ){
+	DataTransmit::RadioDriver->Standby( );
+	DataTransmit::RadioDriver->SetChannel(CHANNEL);
 	DataTransmit::RadioDriver->StartCad( );
 	printf("Start CAD\n");
 }
@@ -36,7 +33,7 @@ extern "C"  [[maybe_unused]] void RadioCadTimeoutIrq( void *context ){
    
 extern "C" void OnCadDone( bool channelActivityDetected ){
 	if(channelActivityDetected){
-		DataTransmit::RadioDriver->Rx(100);
+		DataTransmit::RadioDriver->Rx(1000);
 		printf("Start RX\n");
 	}else{
 		// Channel is clear, proceed with transmission
@@ -48,7 +45,8 @@ extern "C" void OnCadDone( bool channelActivityDetected ){
 
 void OnTxDone(void){
 	DataTransmit::RadioDriver->Standby( );
-	TimerStart(&DataTransmit::CadTimer );	
+	DataTransmit::RadioDriver->SetChannel(CHANNEL);
+	DataTransmit::RadioDriver->StartCad( );
 	printf("Transmission done, restarting CAD\n");
 };
 
@@ -70,19 +68,22 @@ extern "C" void OnRxDone(uint8_t *payload, uint16_t size, int16_t rssi, int8_t L
 
 extern "C" void OnTxTimeout(void){
 	DataTransmit::RadioDriver->Standby( );
-	TimerStart(&DataTransmit::CadTimer );	
+	DataTransmit::RadioDriver->SetChannel(CHANNEL);
+	DataTransmit::RadioDriver->StartCad( );
 	printf("TX Timeout, restarting CAD\n");
 }
 
 extern "C" void OnRxTimeout(void){
 	DataTransmit::RadioDriver->Standby( );
-	TimerStart(&DataTransmit::CadTimer );	
+	DataTransmit::RadioDriver->SetChannel(CHANNEL);
+	DataTransmit::RadioDriver->StartCad( );
 	printf("RX Timeout, restarting CAD\n");
 }
 
 extern "C" void OnRxError(void){
 	DataTransmit::RadioDriver->Standby( );
-	TimerStart(&DataTransmit::CadTimer );	
+	DataTransmit::RadioDriver->SetChannel(CHANNEL);
+	DataTransmit::RadioDriver->StartCad( );
 	printf("RX Error, restarting CAD\n");
 }
 
@@ -100,6 +101,9 @@ void DataTransmit::Init(const struct Radio_s *Radio_){
 	RadioEvents.CadDone = OnCadDone;
 	RadioDriver->Init(&RadioEvents);
 
+	RadioDriver->SetModem(MODEM_LORA);
+	RadioDriver->SetPublicNetwork(true);
+	RadioDriver->RxBoosted(true);	
 	/* radio setup */
 	RadioDriver->SetTxConfig(MODEM_LORA,TX_POWER,0,BANDWIDTH,SPREED_FACTOR,CODE_RATE,PREAMBLE_LEN,FIX_LEN,CRC_ON,
 	  									FREQ_HOP_ON,HOP_PERIODE,SYMBOL_INVERTED,10000);

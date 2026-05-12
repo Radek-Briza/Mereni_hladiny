@@ -108,6 +108,8 @@ int32_t RBI_DeInit(void)
 #endif  /* USE_BSP_DRIVER */
 }
 
+
+
 int32_t RBI_ConfigRFSwitch(RBI_Switch_TypeDef Config)
 {
   /* USER CODE BEGIN RBI_ConfigRFSwitch_1 */
@@ -129,7 +131,34 @@ int32_t RBI_ConfigRFSwitch(RBI_Switch_TypeDef Config)
   /* 2/ Or implement RBI_ConfigRFSwitch here */
   int32_t retcode = 0;
   /* USER CODE BEGIN RBI_ConfigRFSwitch_2 */
-#warning user to provide its board code or to call his board driver functions
+ switch (Config)
+    {
+      case RBI_SWITCH_OFF:
+      {
+        /* Turn off switch */
+        HAL_GPIO_WritePin(FE_CTRL3_GPIO_Port, FE_CTRL3_Pin, GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(FE_CTRL2_GPIO_Port, FE_CTRL2_Pin, GPIO_PIN_RESET);
+        break;
+      }
+      case RBI_SWITCH_RX:
+      {
+        /*Turns On in Rx Mode the RF Switch */
+    	  HAL_GPIO_WritePin(FE_CTRL3_GPIO_Port, FE_CTRL3_Pin, GPIO_PIN_SET);
+    	  HAL_GPIO_WritePin(FE_CTRL2_GPIO_Port, FE_CTRL2_Pin, GPIO_PIN_RESET);
+       	  break;
+      }
+      case RBI_SWITCH_RFO_LP:
+      {
+        /*Turns On in Tx Low Power the RF Switch */
+    	  HAL_GPIO_WritePin(FE_CTRL3_GPIO_Port, FE_CTRL3_Pin, GPIO_PIN_SET);
+    	  HAL_GPIO_WritePin(FE_CTRL2_GPIO_Port, FE_CTRL2_Pin, GPIO_PIN_SET);
+           break;
+      }
+
+      default:
+      break;
+    }
+
   /* USER CODE END RBI_ConfigRFSwitch_2 */
   return retcode;
 #endif  /* USE_BSP_DRIVER */

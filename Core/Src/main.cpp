@@ -28,11 +28,6 @@
 #include <stdio.h>
  
 
-
-#ifdef __GNUC__
-#pragma message "GNUC OK" 
-#endif
-
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "../../App/App.hpp"
