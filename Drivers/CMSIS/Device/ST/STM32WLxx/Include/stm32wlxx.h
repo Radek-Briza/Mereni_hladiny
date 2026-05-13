@@ -57,7 +57,7 @@
   */
 
 #if !defined (STM32WL55xx) && !defined (STM32WL54xx) && !defined (STM32WLE5xx) && !defined (STM32WLE4xx) && !defined(STM32WL5Mxx)
-   #define STM32WL55xx    /*!< STM32WL55xx Devices */
+  /* #define STM32WL55xx */   /*!< STM32WL55xx Devices */
   /* #define STM32WL54xx */   /*!< STM32WL54xx Devices */
   /* #define STM32WLE5xx */   /*!< STM32WLE5xx Devices */
   /* #define STM32WLE4xx */   /*!< STM32WLE4xx Devices */

@@ -13,13 +13,14 @@ set(MX_Defines_Syms
 # STM32CubeMX generated include paths
 set(MX_Include_Dirs
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Inc
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src
+      ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src
     ${CMAKE_CURRENT_SOURCE_DIR}/../../App
     ${CMAKE_CURRENT_SOURCE_DIR}/../../SubGHz_Phy/App
     ${CMAKE_CURRENT_SOURCE_DIR}/../../SubGHz_Phy/Target
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../Utilities/trace/adv_trace
+     ${CMAKE_CURRENT_SOURCE_DIR}/../../Utilities/trace/adv_trace
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/STM32WLxx_HAL_Driver/Inc
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/STM32WLxx_HAL_Driver/Inc/Legacy
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Utilities/trace/adv_trace
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Utilities/misc
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Utilities/sequencer
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Utilities/timer
@@ -35,14 +36,16 @@ set(MX_Application_Src
     ${CMAKE_CURRENT_SOURCE_DIR}/../../SubGHz_Phy/Target/radio_board_if.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../../SubGHz_Phy/App/app_subghz_phy.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../../SubGHz_Phy/App/subghz_phy_app.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/Timer_funct.c
+     ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/Timer_funct.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../../App/app.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../../App/DataTransmit.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../../App/Packet.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../../App/SRF05.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/main.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/gpio.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/adc.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/crc.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/dma.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/rtc.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/subghz.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/stm32_lpm_if.c
@@ -56,14 +59,14 @@ set(MX_Application_Src
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/sysmem.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/syscalls.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../../startup_stm32wl55xx_cm4.s
-
 )
-
-
 
 # STM32 HAL/LL Drivers
 set(STM32_Drivers_Src
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/system_stm32wlxx.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_adc.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_adc_ex.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_ll_adc.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_rcc.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_rcc_ex.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_flash.c

@@ -18,8 +18,13 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 
+
 #include "main.h"  
 #include "sys_app.h"
+
+#include "adc.h"
+#include "crc.h"
+#include "dma.h"
 #include "app_subghz_phy.h"  
 #include "tim.h"
 #include "wwdg.h"
@@ -98,6 +103,9 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
+  MX_CRC_Init();
+  MX_ADC_Init();
  // MX_WWDG_Init();
   //MX_SubGHz_Phy_Init();
   MX_TIM1_Init();

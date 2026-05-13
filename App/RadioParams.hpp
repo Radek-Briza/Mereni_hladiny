@@ -8,20 +8,22 @@
 #ifndef RADIOPARAMS_HPP_
 #define RADIOPARAMS_HPP_
 
-#define CHANNEL  868500000//869525000//865000000
-#define TX_POWER	5
+#include "main.h"
 
-#define BANDWIDTH			0 // 125 kHz
-#define SPREED_FACTOR		12
-#define CODE_RATE			1
-#define PREAMBLE_LEN        1000
-#define FIX_LEN				false
-#define CRC_ON				true
-#define FREQ_HOP_ON			false
-#define HOP_PERIODE			0
-#define SYMBOL_INVERTED		true
-#define PAYLOAD_LEN			0
-#define SYMB_TIMEOUT		1000  // pocet symbolu
+const uint32_t CHANNEL  = 869525000;
+const uint8_t TX_POWER	= 5;
+
+const uint8_t BANDWIDTH			= 0; // 125 kHz
+const uint8_t SPREED_FACTOR		= 12;
+const uint8_t CODE_RATE			= 1;
+const uint32_t PREAMBLE_LEN        = 800;
+const bool FIX_LEN				= false;
+const bool CRC_ON				= true;
+const bool FREQ_HOP_ON			= false;
+const uint8_t HOP_PERIODE			= 0;
+const bool SYMBOL_INVERTED		= true;
+const uint8_t PAYLOAD_LEN			= 0;
+const uint16_t SYMB_TIMEOUT		= 1000;  // pocet symbolu
 
 
 

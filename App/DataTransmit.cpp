@@ -33,12 +33,11 @@ void RadioCadTimeoutIrq( void *context ){
    
 extern "C" void OnCadDone( bool channelActivityDetected ){
 	if(channelActivityDetected){
-		DataTransmit::RadioDriver->Rx(1000);
-		printf("Start RX\n");
+		DataTransmit::RadioDriver->Rx(800);
+		printf(">>>>Start RX\n");
 	}else{
 		// Channel is clear, proceed with transmission
 		TimerStart(&DataTransmit::CadTimer );
-		printf("Channel is clear\n");	
 	}
 }
 
@@ -64,6 +63,8 @@ extern "C" void OnRxDone(uint8_t *payload, uint16_t size, int16_t rssi, int8_t L
 		DataTransmit::DataAvailable = true;
 	}
 	DataTransmit::RadioDriver->Standby( );
+	DataTransmit::RadioDriver->SetChannel(CHANNEL);
+	DataTransmit::RadioDriver->StartCad( );
 }
 
 extern "C" void OnTxTimeout(void){

@@ -27,7 +27,6 @@
 
 #include <stdint.h>
 
-
 /*
  * Arm Compiler 4/5
  */

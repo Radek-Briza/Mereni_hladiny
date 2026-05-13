@@ -108,8 +108,6 @@ int32_t RBI_DeInit(void)
 #endif  /* USE_BSP_DRIVER */
 }
 
-
-
 int32_t RBI_ConfigRFSwitch(RBI_Switch_TypeDef Config)
 {
   /* USER CODE BEGIN RBI_ConfigRFSwitch_1 */
