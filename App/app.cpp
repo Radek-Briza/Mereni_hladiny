@@ -4,7 +4,7 @@
  *  Created on: 11. 4. 2026
  *      Author: radek
  */
-
+#include "main.h"
 #include  "App.hpp"
 #include "stdlib.h"
 #include "SRF05.h"
@@ -19,7 +19,7 @@ void App::init()
 {
     // inicializace (např. periferií)
 	EchoDriver.setModeMedian(10);
-	DataTransmitter.Init(&Radio);
+	DataTransmit::GetInstance().Init(&Radio);
 	printf("Init device\r");
 }
 	

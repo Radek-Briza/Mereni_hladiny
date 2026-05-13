@@ -76,7 +76,7 @@ int32_t RBI_Init(void)
   /* 2/ Or implement RBI_Init here */
   int32_t retcode = 0;
   /* USER CODE BEGIN RBI_Init_2 */
-#warning user to provide its board code or to call his board driver functions
+//#warning user to provide its board code or to call his board driver functions
   /* USER CODE END RBI_Init_2 */
   return retcode;
 #endif  /* USE_BSP_DRIVER  */
@@ -102,7 +102,7 @@ int32_t RBI_DeInit(void)
   /* 2/ Or implement RBI_DeInit here */
   int32_t retcode = 0;
   /* USER CODE BEGIN RBI_DeInit_2 */
-#warning user to provide its board code or to call his board driver functions
+//#warning user to provide its board code or to call his board driver functions
   /* USER CODE END RBI_DeInit_2 */
   return retcode;
 #endif  /* USE_BSP_DRIVER */
@@ -182,7 +182,7 @@ int32_t RBI_GetTxConfig(void)
   /* 2/ Or implement RBI_GetTxConfig here */
   int32_t retcode = RBI_CONF_RFO;
   /* USER CODE BEGIN RBI_GetTxConfig_2 */
-#warning user to provide its board code or to call his board driver functions
+//#warning user to provide its board code or to call his board driver functions
   /* USER CODE END RBI_GetTxConfig_2 */
   return retcode;
 #endif  /* USE_BSP_DRIVER */
@@ -208,7 +208,7 @@ int32_t RBI_IsTCXO(void)
   /* 2/ Or implement RBI_IsTCXO here */
   int32_t retcode = IS_TCXO_SUPPORTED;
   /* USER CODE BEGIN RBI_IsTCXO_2 */
-#warning user to provide its board code or to call his board driver functions
+//#warning user to provide its board code or to call his board driver functions
   /* USER CODE END RBI_IsTCXO_2 */
   return retcode;
 #endif  /* USE_BSP_DRIVER  */
@@ -234,7 +234,7 @@ int32_t RBI_IsDCDC(void)
   /* 2/ Or implement RBI_IsDCDC here */
   int32_t retcode = IS_DCDC_SUPPORTED;
   /* USER CODE BEGIN RBI_IsDCDC_2 */
-#warning user to provide its board code or to call his board driver functions
+//#warning user to provide its board code or to call his board driver functions
   /* USER CODE END RBI_IsDCDC_2 */
   return retcode;
 #endif  /* USE_BSP_DRIVER  */
@@ -260,7 +260,7 @@ int32_t RBI_GetRFOMaxPowerConfig(RBI_RFOMaxPowerConfig_TypeDef Config)
   /* 2/ Or implement RBI_RBI_GetRFOMaxPowerConfig here */
   int32_t ret = 0;
   /* USER CODE BEGIN RBI_GetRFOMaxPowerConfig_2 */
-#warning user to provide its board code or to call his board driver functions
+//#warning user to provide its board code or to call his board driver functions
   if (Config == RBI_RFO_LP_MAXPOWER)
   {
     ret = 15; /*dBm*/

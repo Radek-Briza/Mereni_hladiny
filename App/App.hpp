@@ -17,7 +17,6 @@ public:
     void loop();
 
     private:
-    DataTransmit DataTransmitter; // Instance pro správu přenosu dat
    
 };
 

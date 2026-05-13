@@ -12,18 +12,25 @@
 #include <cstring>
 #include <cstdio>
 
+bool DataTransmit::MasterMode = false;
+bool DataTransmit::RequestSent = false;
 bool DataTransmit::DataAvailable = false;
 bool DataTransmit::DataOverload = false;
 const struct Radio_s* DataTransmit::RadioDriver = nullptr;
 RadioEvents_t DataTransmit::RadioEvents = {};
 TimerEvent_t DataTransmit::CadTimer = {};
 Packet DataTransmit::packet = {};
-std::array<uint8_t, Packet::max_packet_size> DataTransmit::Data = {};
-Packet::PacketType DataTransmit::DataType = Packet::Data_level;
+bool DataTransmit::SlaveNotResponding = false;
+Packet::PacketType DataTransmit::DataType = Packet::Type_undefined;
+//DataTransmit::MasterMode = false;
+
 
 
 extern "C"  [[maybe_unused]] 
 void RadioCadTimeoutIrq( void *context ){
+	if( DataTransmit::MasterMode == true){
+		return; // pokud jsme v master modu, neprovádíme CAD
+	}
 	DataTransmit::RadioDriver->Standby( );
 	DataTransmit::RadioDriver->SetChannel(CHANNEL);
 	DataTransmit::RadioDriver->StartCad( );
@@ -33,7 +40,8 @@ void RadioCadTimeoutIrq( void *context ){
    
 extern "C" void OnCadDone( bool channelActivityDetected ){
 	if(channelActivityDetected){
-		DataTransmit::RadioDriver->Rx(800);
+		DataTransmit::RadioDriver->Rx(1200);
+		TimerStop(&DataTransmit::CadTimer );
 		printf(">>>>Start RX\n");
 	}else{
 		// Channel is clear, proceed with transmission
@@ -43,19 +51,22 @@ extern "C" void OnCadDone( bool channelActivityDetected ){
 
 
 void OnTxDone(void){
+	if( DataTransmit::MasterMode == true){
+		return; // pokud jsme v master modu, neprovádíme CAD
+	}
 	DataTransmit::RadioDriver->Standby( );
 	DataTransmit::RadioDriver->SetChannel(CHANNEL);
 	DataTransmit::RadioDriver->StartCad( );
 	printf("Transmission done, restarting CAD\n");
 };
 
-
+/* Callback functions - Rx complete */
 extern "C" void OnRxDone(uint8_t *payload, uint16_t size, int16_t rssi, int8_t LoraSnr_FskCfo){
 	printf("Received packet: size=%u, rssi=%d, snr=%d\n", size, rssi, LoraSnr_FskCfo);
 	// kopírujeme payload do packetu pro další zpracování
 	std::array<uint8_t, Packet::max_packet_size> buffer{};
 	std::memcpy(buffer.data(), payload, size);
-	if(DataTransmit::packet.ParsePacket(buffer, DataTransmit::DataType, DataTransmit::Data)){
+	if(DataTransmit::packet.ParsePacket(buffer)==true){
 		if(DataTransmit::DataAvailable){
 			DataTransmit::DataOverload = true;
 		}
@@ -68,6 +79,9 @@ extern "C" void OnRxDone(uint8_t *payload, uint16_t size, int16_t rssi, int8_t L
 }
 
 extern "C" void OnTxTimeout(void){
+	if( DataTransmit::MasterMode == true){
+		return; // pokud jsme v master modu, neprovádíme CAD
+	}
 	DataTransmit::RadioDriver->Standby( );
 	DataTransmit::RadioDriver->SetChannel(CHANNEL);
 	DataTransmit::RadioDriver->StartCad( );
@@ -75,6 +89,13 @@ extern "C" void OnTxTimeout(void){
 }
 
 extern "C" void OnRxTimeout(void){
+	if( DataTransmit::MasterMode == true){
+		if(DataTransmit::RequestSent){
+			DataTransmit::RequestSent = false;
+			DataTransmit::SlaveNotResponding = true;
+		}
+		return; // pokud jsme v master modu, neprovádíme CAD
+	}
 	DataTransmit::RadioDriver->Standby( );
 	DataTransmit::RadioDriver->SetChannel(CHANNEL);
 	DataTransmit::RadioDriver->StartCad( );
@@ -82,16 +103,24 @@ extern "C" void OnRxTimeout(void){
 }
 
 extern "C" void OnRxError(void){
+	if( DataTransmit::MasterMode == true){
+		if(DataTransmit::RequestSent){
+			DataTransmit::RequestSent = false;
+			DataTransmit::SlaveNotResponding = true;
+		}
+		return; // pokud jsme v master modu, neprovádíme CAD
+	}
 	DataTransmit::RadioDriver->Standby( );
 	DataTransmit::RadioDriver->SetChannel(CHANNEL);
 	DataTransmit::RadioDriver->StartCad( );
 	printf("RX Error, restarting CAD\n");
 }
 
-
-void DataTransmit::Init(const struct Radio_s *Radio_){
+/* init  radio */
+void DataTransmit::Init(const struct Radio_s *Radio_,bool MasterMode_){
 	assert(Radio_ != nullptr); 
 	RadioDriver = Radio_;
+	MasterMode = MasterMode_;
 	
 	/* events  setup */
 	RadioEvents.TxDone = OnTxDone;
@@ -114,17 +143,35 @@ void DataTransmit::Init(const struct Radio_s *Radio_){
 	RadioDriver->Standby( );
  	
 	/* CAD sampler timer setup */
-	TimerInit( &CadTimer,RadioCadTimeoutIrq );
-	TimerSetValue( &CadTimer,CAD_sample );
-    TimerStart( &CadTimer );	
+	if(MasterMode == false){
+		TimerInit( &CadTimer,RadioCadTimeoutIrq );
+		TimerSetValue( &CadTimer,CAD_sample );
+		TimerStart( &CadTimer );	
+	}
 	DataAvailable = false;		
 	DataOverload = false;		
 	printf("DataTransmit initialized\n");
 }
 
-
-
-
-
-
+/* odeslat požadavek na data */
+bool DataTransmit::SendRquest(Packet::PacketType Type){
+	
+	/* create packet */
+	if(!packet.CreatePacket(Type)){
+		printf("Packet creation failed!\n");
+		return false; // Packet creation failed
+	}
+	/* send packet */
+	RequestSent = true;
+	SlaveNotResponding = false;
+	RadioDriver->Standby( );
+	RadioDriver->SetChannel(CHANNEL);
+	RadioDriver->Send(packet.Packet_output.data(), packet.Packet_output.size());
+	while(RadioDriver->GetStatus( )==RF_TX_RUNNING){
+		// čekáme na dokončení vysílání
+	}
+	RadioDriver->Rx(ResponseTimeout); // Po odeslání požadavku přepneme rádio do přijímacího režimu
+	
+	return true;
+}
 

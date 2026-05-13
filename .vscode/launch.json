@@ -1,18 +1,22 @@
 {
     "version": "0.2.0",
     "configurations": [
+        
         {
             "name": "STM32 Debug",
             "type": "cortex-debug",
             "request": "launch",
 
+            "showDevDebugOutput": "raw",
             "servertype": "stlink",
 
             "cwd": "${workspaceFolder}",
 
             "executable": "${workspaceFolder}/build/Debug/Mereni_hladiny.elf",
 
-            "device": "STM32WLE55CC",
+            "device": "STM32WL55JCI6",
+
+            "serialNumber": "002B00073756501520303658",
 
             "runToEntryPoint": "main",
 
