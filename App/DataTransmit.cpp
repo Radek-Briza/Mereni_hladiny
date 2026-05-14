@@ -72,6 +72,7 @@ extern "C" void OnRxDone(uint8_t *payload, uint16_t size, int16_t rssi, int8_t L
 		}
 		else DataTransmit::DataOverload = false;
 		DataTransmit::DataAvailable = true;
+		DataTransmit::DataType = DataTransmit::packet.Type_out; // Uložení typu dat z příchozího packetu
 	}
 	DataTransmit::RadioDriver->Standby( );
 	DataTransmit::RadioDriver->SetChannel(CHANNEL);
@@ -162,11 +163,18 @@ bool DataTransmit::SendRquest(Packet::PacketType Type){
 		return false; // Packet creation failed
 	}
 	/* send packet */
+	printf("Raw data sent: ");
+	for(size_t i = 0; i < packet.Packet_output.size(); ++i){
+		printf("%02X ", packet.Packet_output[i]);
+	}
+	printf("\n");
+	
 	RequestSent = true;
 	SlaveNotResponding = false;
 	RadioDriver->Standby( );
 	RadioDriver->SetChannel(CHANNEL);
 	RadioDriver->Send(packet.Packet_output.data(), packet.Packet_output.size());
+	
 	while(RadioDriver->GetStatus( )==RF_TX_RUNNING){
 		// čekáme na dokončení vysílání
 	}
@@ -175,3 +183,30 @@ bool DataTransmit::SendRquest(Packet::PacketType Type){
 	return true;
 }
 
+/*odeslani dat  */
+bool DataTransmit::SendData(Packet::PacketType Type,std::vector<uint8_t>& data){
+	if(data.size() > Packet::max_payload_size){
+		printf("Data size exceeds maximum payload size!\n");
+		return false; // Data size exceeds maximum payload size
+	}
+	
+	/* create packet */
+	if(!packet.CreatePacket(Type, data)){
+		printf("Packet creation failed!\n");
+		return false; // Packet creation failed
+	}
+	
+	/* send packet */
+	printf("Raw data sent: ");
+	for(size_t i = 0; i < packet.Packet_output.size(); ++i){
+		printf("%02X ", packet.Packet_output[i]);
+	}
+	printf("\n");
+
+	TimerStop( &CadTimer );	
+	RadioDriver->Standby( );
+	RadioDriver->SetChannel(CHANNEL);
+	RadioDriver->Send(packet.Packet_output.data(), packet.Packet_output.size());
+
+	return true;
+}

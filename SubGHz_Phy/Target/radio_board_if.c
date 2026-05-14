@@ -136,6 +136,7 @@ int32_t RBI_ConfigRFSwitch(RBI_Switch_TypeDef Config)
         /* Turn off switch */
         HAL_GPIO_WritePin(FE_CTRL3_GPIO_Port, FE_CTRL3_Pin, GPIO_PIN_RESET);
         HAL_GPIO_WritePin(FE_CTRL2_GPIO_Port, FE_CTRL2_Pin, GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(FE_CTRL1_GPIO_Port, FE_CTRL1_Pin, GPIO_PIN_RESET);
         break;
       }
       case RBI_SWITCH_RX:
@@ -143,6 +144,7 @@ int32_t RBI_ConfigRFSwitch(RBI_Switch_TypeDef Config)
         /*Turns On in Rx Mode the RF Switch */
     	  HAL_GPIO_WritePin(FE_CTRL3_GPIO_Port, FE_CTRL3_Pin, GPIO_PIN_SET);
     	  HAL_GPIO_WritePin(FE_CTRL2_GPIO_Port, FE_CTRL2_Pin, GPIO_PIN_RESET);
+       	HAL_GPIO_WritePin(FE_CTRL1_GPIO_Port, FE_CTRL1_Pin, GPIO_PIN_SET);
        	  break;
       }
       case RBI_SWITCH_RFO_LP:
@@ -150,7 +152,8 @@ int32_t RBI_ConfigRFSwitch(RBI_Switch_TypeDef Config)
         /*Turns On in Tx Low Power the RF Switch */
     	  HAL_GPIO_WritePin(FE_CTRL3_GPIO_Port, FE_CTRL3_Pin, GPIO_PIN_SET);
     	  HAL_GPIO_WritePin(FE_CTRL2_GPIO_Port, FE_CTRL2_Pin, GPIO_PIN_SET);
-           break;
+        HAL_GPIO_WritePin(FE_CTRL1_GPIO_Port, FE_CTRL1_Pin, GPIO_PIN_SET);
+        break;
       }
 
       default:

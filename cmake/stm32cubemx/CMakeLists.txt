@@ -129,7 +129,9 @@ set(MX_LINK_LIBS
 )
 # Interface library for includes and symbols
 add_library(stm32cubemx INTERFACE)
-target_include_directories(stm32cubemx INTERFACE ${MX_Include_Dirs})
+target_include_directories(stm32cubemx SYSTEM INTERFACE
+    ${MX_Include_Dirs}
+)
 target_compile_definitions(stm32cubemx INTERFACE ${MX_Defines_Syms})
 
 # Create STM32_Drivers static library

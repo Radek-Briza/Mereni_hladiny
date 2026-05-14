@@ -35,13 +35,15 @@ public:
 	}
 	void Init(const struct Radio_s *Radio_, bool MasterMode_ = false);
 	bool SendRquest(Packet::PacketType Type);
-	 Packet::PacketType GetReceivedDataType() const { return DataType; }
+	bool SendData(Packet::PacketType Type,std::vector<uint8_t>& data);
+	Packet::PacketType GetReceivedDataType() const { return DataType; }
 	static bool DataAvailable;
 	static bool DataOverload; 
 	static bool RequestSent;
 	static bool MasterMode;
 	static bool SlaveNotResponding;
 	static Packet::PacketType ReceivedDataType;
+	using PacketType = Packet::PacketType;
 	
 
 private:

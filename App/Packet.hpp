@@ -29,19 +29,19 @@ public:
         static const int packet_id_size = 2; // Example size for Packet ID
         static const int data_length_size = 2; // Example size for Data Length
         static const int crc_size = 2; // CRC16 size for MODBUS
-        static const int header_size = packet_id_size+data_length_size+crc_size ; // Header metadata size   
+        static const int header_size = (packet_id_size*2)+data_length_size+crc_size ; // Header metadata size   
         static const int  max_payload_size = max_packet_size - header_size; // Remaining 
         std::vector<uint8_t> Packet_output = {}; // Output packet buffer
         std::vector<uint8_t> Payload_output = {}; // Buffer for received payload from radio
-        PacketType Type_out = Type_undefined; // Variable for received packet type from radio
+        Packet::PacketType Type_out = Packet::Type_undefined; // Variable for received packet type from radio
 
-    bool CreatePacket(PacketType Type, std::vector<uint8_t> &Payload_input);
-    bool CreatePacket(PacketType Type);
-    bool ParsePacket(std::array<uint8_t, Packet::max_packet_size> const& Packet_inp );
+    bool CreatePacket(Packet::PacketType Type, std::vector<uint8_t> &Payload_input);
+    bool CreatePacket(Packet::PacketType Type);
+    bool ParsePacket(std::array<uint8_t, Packet::max_packet_size> & Packet_inp );
         
     private:
     auto SegmentPacketToSpans(std::array<uint8_t,Packet::max_packet_size>& buffer) ;    
-    std::array<uint8_t, max_packet_size> Packet_out; // Output packet buffer
+    std::array<uint8_t, max_packet_size> PacketData; // Output packet buffer
     uint16_t ID; // Packet ID
         
 };  

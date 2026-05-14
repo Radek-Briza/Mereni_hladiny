@@ -179,7 +179,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "d:/Mereni_hladiy/build/Debug"
+			"value" : "d:/Mereni_hladiny/build/Debug"
 		},
 		{
 			"name" : "CMAKE_CACHE_MAJOR_VERSION",
@@ -647,7 +647,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "D:/Mereni_hladiy/build/Debug/CMakeFiles/pkgRedirects"
+			"value" : "D:/Mereni_hladiny/build/Debug/CMakeFiles/pkgRedirects"
 		},
 		{
 			"name" : "CMAKE_GENERATOR",
@@ -707,7 +707,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "D:/Mereni_hladiy"
+			"value" : "D:/Mereni_hladiny"
 		},
 		{
 			"name" : "CMAKE_INSTALL_PREFIX",
@@ -1219,7 +1219,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "D:/Mereni_hladiy/cmake/gcc-arm-none-eabi.cmake"
+			"value" : "D:/Mereni_hladiny/cmake/gcc-arm-none-eabi.cmake"
 		},
 		{
 			"name" : "CMAKE_VERBOSE_MAKEFILE",
@@ -1247,7 +1247,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "D:/Mereni_hladiy/build/Debug"
+			"value" : "D:/Mereni_hladiny/build/Debug"
 		},
 		{
 			"name" : "Mereni_hladiny_IS_TOP_LEVEL",
@@ -1271,7 +1271,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "D:/Mereni_hladiy"
+			"value" : "D:/Mereni_hladiny"
 		}
 	],
 	"kind" : "cache",

@@ -36,7 +36,7 @@
 			{
 				"command" : 1,
 				"file" : 1,
-				"line" : 158,
+				"line" : 160,
 				"parent" : 2
 			},
 			{
@@ -48,7 +48,7 @@
 			{
 				"command" : 2,
 				"file" : 1,
-				"line" : 152,
+				"line" : 154,
 				"parent" : 2
 			}
 		]
@@ -113,67 +113,83 @@
 			[
 				{
 					"backtrace" : 3,
-					"path" : "D:/Mereni_hladiy/cmake/stm32cubemx/../../Core/Inc"
+					"isSystem" : true,
+					"path" : "D:/Mereni_hladiny/cmake/stm32cubemx/../../Core/Inc"
 				},
 				{
 					"backtrace" : 3,
-					"path" : "D:/Mereni_hladiy/cmake/stm32cubemx/../../Core/Src"
+					"isSystem" : true,
+					"path" : "D:/Mereni_hladiny/cmake/stm32cubemx/../../Core/Src"
 				},
 				{
 					"backtrace" : 3,
-					"path" : "D:/Mereni_hladiy/cmake/stm32cubemx/../../App"
+					"isSystem" : true,
+					"path" : "D:/Mereni_hladiny/cmake/stm32cubemx/../../App"
 				},
 				{
 					"backtrace" : 3,
-					"path" : "D:/Mereni_hladiy/cmake/stm32cubemx/../../SubGHz_Phy/App"
+					"isSystem" : true,
+					"path" : "D:/Mereni_hladiny/cmake/stm32cubemx/../../SubGHz_Phy/App"
 				},
 				{
 					"backtrace" : 3,
-					"path" : "D:/Mereni_hladiy/cmake/stm32cubemx/../../SubGHz_Phy/Target"
+					"isSystem" : true,
+					"path" : "D:/Mereni_hladiny/cmake/stm32cubemx/../../SubGHz_Phy/Target"
 				},
 				{
 					"backtrace" : 3,
-					"path" : "D:/Mereni_hladiy/cmake/stm32cubemx/../../Utilities/trace/adv_trace"
+					"isSystem" : true,
+					"path" : "D:/Mereni_hladiny/cmake/stm32cubemx/../../Utilities/trace/adv_trace"
 				},
 				{
 					"backtrace" : 3,
-					"path" : "D:/Mereni_hladiy/cmake/stm32cubemx/../../Drivers/STM32WLxx_HAL_Driver/Inc"
+					"isSystem" : true,
+					"path" : "D:/Mereni_hladiny/cmake/stm32cubemx/../../Drivers/STM32WLxx_HAL_Driver/Inc"
 				},
 				{
 					"backtrace" : 3,
-					"path" : "D:/Mereni_hladiy/cmake/stm32cubemx/../../Drivers/STM32WLxx_HAL_Driver/Inc/Legacy"
+					"isSystem" : true,
+					"path" : "D:/Mereni_hladiny/cmake/stm32cubemx/../../Drivers/STM32WLxx_HAL_Driver/Inc/Legacy"
 				},
 				{
 					"backtrace" : 3,
-					"path" : "D:/Mereni_hladiy/cmake/stm32cubemx/../../Utilities/misc"
+					"isSystem" : true,
+					"path" : "D:/Mereni_hladiny/cmake/stm32cubemx/../../Utilities/misc"
 				},
 				{
 					"backtrace" : 3,
-					"path" : "D:/Mereni_hladiy/cmake/stm32cubemx/../../Utilities/sequencer"
+					"isSystem" : true,
+					"path" : "D:/Mereni_hladiny/cmake/stm32cubemx/../../Utilities/sequencer"
 				},
 				{
 					"backtrace" : 3,
-					"path" : "D:/Mereni_hladiy/cmake/stm32cubemx/../../Utilities/timer"
+					"isSystem" : true,
+					"path" : "D:/Mereni_hladiny/cmake/stm32cubemx/../../Utilities/timer"
 				},
 				{
 					"backtrace" : 3,
-					"path" : "D:/Mereni_hladiy/cmake/stm32cubemx/../../Utilities/lpm/tiny_lpm"
+					"isSystem" : true,
+					"path" : "D:/Mereni_hladiny/cmake/stm32cubemx/../../Utilities/lpm/tiny_lpm"
 				},
 				{
 					"backtrace" : 3,
-					"path" : "D:/Mereni_hladiy/cmake/stm32cubemx/../../Drivers/BSP/STM32WLxx_Nucleo"
+					"isSystem" : true,
+					"path" : "D:/Mereni_hladiny/cmake/stm32cubemx/../../Drivers/BSP/STM32WLxx_Nucleo"
 				},
 				{
 					"backtrace" : 3,
-					"path" : "D:/Mereni_hladiy/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32WLxx/Include"
+					"isSystem" : true,
+					"path" : "D:/Mereni_hladiny/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32WLxx/Include"
 				},
 				{
 					"backtrace" : 3,
-					"path" : "D:/Mereni_hladiy/cmake/stm32cubemx/../../Middlewares/Third_Party/SubGHz_Phy/radio_driver"
+					"isSystem" : true,
+					"path" : "D:/Mereni_hladiny/cmake/stm32cubemx/../../Middlewares/Third_Party/SubGHz_Phy/radio_driver"
 				},
 				{
 					"backtrace" : 3,
-					"path" : "D:/Mereni_hladiy/cmake/stm32cubemx/../../Drivers/CMSIS/Include"
+					"isSystem" : true,
+					"path" : "D:/Mereni_hladiny/cmake/stm32cubemx/../../Drivers/CMSIS/Include"
 				}
 			],
 			"language" : "C",
@@ -243,67 +259,83 @@
 			[
 				{
 					"backtrace" : 3,
-					"path" : "D:/Mereni_hladiy/cmake/stm32cubemx/../../Core/Inc"
+					"isSystem" : true,
+					"path" : "D:/Mereni_hladiny/cmake/stm32cubemx/../../Core/Inc"
 				},
 				{
 					"backtrace" : 3,
-					"path" : "D:/Mereni_hladiy/cmake/stm32cubemx/../../Core/Src"
+					"isSystem" : true,
+					"path" : "D:/Mereni_hladiny/cmake/stm32cubemx/../../Core/Src"
 				},
 				{
 					"backtrace" : 3,
-					"path" : "D:/Mereni_hladiy/cmake/stm32cubemx/../../App"
+					"isSystem" : true,
+					"path" : "D:/Mereni_hladiny/cmake/stm32cubemx/../../App"
 				},
 				{
 					"backtrace" : 3,
-					"path" : "D:/Mereni_hladiy/cmake/stm32cubemx/../../SubGHz_Phy/App"
+					"isSystem" : true,
+					"path" : "D:/Mereni_hladiny/cmake/stm32cubemx/../../SubGHz_Phy/App"
 				},
 				{
 					"backtrace" : 3,
-					"path" : "D:/Mereni_hladiy/cmake/stm32cubemx/../../SubGHz_Phy/Target"
+					"isSystem" : true,
+					"path" : "D:/Mereni_hladiny/cmake/stm32cubemx/../../SubGHz_Phy/Target"
 				},
 				{
 					"backtrace" : 3,
-					"path" : "D:/Mereni_hladiy/cmake/stm32cubemx/../../Utilities/trace/adv_trace"
+					"isSystem" : true,
+					"path" : "D:/Mereni_hladiny/cmake/stm32cubemx/../../Utilities/trace/adv_trace"
 				},
 				{
 					"backtrace" : 3,
-					"path" : "D:/Mereni_hladiy/cmake/stm32cubemx/../../Drivers/STM32WLxx_HAL_Driver/Inc"
+					"isSystem" : true,
+					"path" : "D:/Mereni_hladiny/cmake/stm32cubemx/../../Drivers/STM32WLxx_HAL_Driver/Inc"
 				},
 				{
 					"backtrace" : 3,
-					"path" : "D:/Mereni_hladiy/cmake/stm32cubemx/../../Drivers/STM32WLxx_HAL_Driver/Inc/Legacy"
+					"isSystem" : true,
+					"path" : "D:/Mereni_hladiny/cmake/stm32cubemx/../../Drivers/STM32WLxx_HAL_Driver/Inc/Legacy"
 				},
 				{
 					"backtrace" : 3,
-					"path" : "D:/Mereni_hladiy/cmake/stm32cubemx/../../Utilities/misc"
+					"isSystem" : true,
+					"path" : "D:/Mereni_hladiny/cmake/stm32cubemx/../../Utilities/misc"
 				},
 				{
 					"backtrace" : 3,
-					"path" : "D:/Mereni_hladiy/cmake/stm32cubemx/../../Utilities/sequencer"
+					"isSystem" : true,
+					"path" : "D:/Mereni_hladiny/cmake/stm32cubemx/../../Utilities/sequencer"
 				},
 				{
 					"backtrace" : 3,
-					"path" : "D:/Mereni_hladiy/cmake/stm32cubemx/../../Utilities/timer"
+					"isSystem" : true,
+					"path" : "D:/Mereni_hladiny/cmake/stm32cubemx/../../Utilities/timer"
 				},
 				{
 					"backtrace" : 3,
-					"path" : "D:/Mereni_hladiy/cmake/stm32cubemx/../../Utilities/lpm/tiny_lpm"
+					"isSystem" : true,
+					"path" : "D:/Mereni_hladiny/cmake/stm32cubemx/../../Utilities/lpm/tiny_lpm"
 				},
 				{
 					"backtrace" : 3,
-					"path" : "D:/Mereni_hladiy/cmake/stm32cubemx/../../Drivers/BSP/STM32WLxx_Nucleo"
+					"isSystem" : true,
+					"path" : "D:/Mereni_hladiny/cmake/stm32cubemx/../../Drivers/BSP/STM32WLxx_Nucleo"
 				},
 				{
 					"backtrace" : 3,
-					"path" : "D:/Mereni_hladiy/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32WLxx/Include"
+					"isSystem" : true,
+					"path" : "D:/Mereni_hladiny/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32WLxx/Include"
 				},
 				{
 					"backtrace" : 3,
-					"path" : "D:/Mereni_hladiy/cmake/stm32cubemx/../../Middlewares/Third_Party/SubGHz_Phy/radio_driver"
+					"isSystem" : true,
+					"path" : "D:/Mereni_hladiny/cmake/stm32cubemx/../../Middlewares/Third_Party/SubGHz_Phy/radio_driver"
 				},
 				{
 					"backtrace" : 3,
-					"path" : "D:/Mereni_hladiy/cmake/stm32cubemx/../../Drivers/CMSIS/Include"
+					"isSystem" : true,
+					"path" : "D:/Mereni_hladiny/cmake/stm32cubemx/../../Drivers/CMSIS/Include"
 				}
 			],
 			"language" : "CXX",
@@ -358,67 +390,83 @@
 			[
 				{
 					"backtrace" : 3,
-					"path" : "D:/Mereni_hladiy/cmake/stm32cubemx/../../Core/Inc"
+					"isSystem" : true,
+					"path" : "D:/Mereni_hladiny/cmake/stm32cubemx/../../Core/Inc"
 				},
 				{
 					"backtrace" : 3,
-					"path" : "D:/Mereni_hladiy/cmake/stm32cubemx/../../Core/Src"
+					"isSystem" : true,
+					"path" : "D:/Mereni_hladiny/cmake/stm32cubemx/../../Core/Src"
 				},
 				{
 					"backtrace" : 3,
-					"path" : "D:/Mereni_hladiy/cmake/stm32cubemx/../../App"
+					"isSystem" : true,
+					"path" : "D:/Mereni_hladiny/cmake/stm32cubemx/../../App"
 				},
 				{
 					"backtrace" : 3,
-					"path" : "D:/Mereni_hladiy/cmake/stm32cubemx/../../SubGHz_Phy/App"
+					"isSystem" : true,
+					"path" : "D:/Mereni_hladiny/cmake/stm32cubemx/../../SubGHz_Phy/App"
 				},
 				{
 					"backtrace" : 3,
-					"path" : "D:/Mereni_hladiy/cmake/stm32cubemx/../../SubGHz_Phy/Target"
+					"isSystem" : true,
+					"path" : "D:/Mereni_hladiny/cmake/stm32cubemx/../../SubGHz_Phy/Target"
 				},
 				{
 					"backtrace" : 3,
-					"path" : "D:/Mereni_hladiy/cmake/stm32cubemx/../../Utilities/trace/adv_trace"
+					"isSystem" : true,
+					"path" : "D:/Mereni_hladiny/cmake/stm32cubemx/../../Utilities/trace/adv_trace"
 				},
 				{
 					"backtrace" : 3,
-					"path" : "D:/Mereni_hladiy/cmake/stm32cubemx/../../Drivers/STM32WLxx_HAL_Driver/Inc"
+					"isSystem" : true,
+					"path" : "D:/Mereni_hladiny/cmake/stm32cubemx/../../Drivers/STM32WLxx_HAL_Driver/Inc"
 				},
 				{
 					"backtrace" : 3,
-					"path" : "D:/Mereni_hladiy/cmake/stm32cubemx/../../Drivers/STM32WLxx_HAL_Driver/Inc/Legacy"
+					"isSystem" : true,
+					"path" : "D:/Mereni_hladiny/cmake/stm32cubemx/../../Drivers/STM32WLxx_HAL_Driver/Inc/Legacy"
 				},
 				{
 					"backtrace" : 3,
-					"path" : "D:/Mereni_hladiy/cmake/stm32cubemx/../../Utilities/misc"
+					"isSystem" : true,
+					"path" : "D:/Mereni_hladiny/cmake/stm32cubemx/../../Utilities/misc"
 				},
 				{
 					"backtrace" : 3,
-					"path" : "D:/Mereni_hladiy/cmake/stm32cubemx/../../Utilities/sequencer"
+					"isSystem" : true,
+					"path" : "D:/Mereni_hladiny/cmake/stm32cubemx/../../Utilities/sequencer"
 				},
 				{
 					"backtrace" : 3,
-					"path" : "D:/Mereni_hladiy/cmake/stm32cubemx/../../Utilities/timer"
+					"isSystem" : true,
+					"path" : "D:/Mereni_hladiny/cmake/stm32cubemx/../../Utilities/timer"
 				},
 				{
 					"backtrace" : 3,
-					"path" : "D:/Mereni_hladiy/cmake/stm32cubemx/../../Utilities/lpm/tiny_lpm"
+					"isSystem" : true,
+					"path" : "D:/Mereni_hladiny/cmake/stm32cubemx/../../Utilities/lpm/tiny_lpm"
 				},
 				{
 					"backtrace" : 3,
-					"path" : "D:/Mereni_hladiy/cmake/stm32cubemx/../../Drivers/BSP/STM32WLxx_Nucleo"
+					"isSystem" : true,
+					"path" : "D:/Mereni_hladiny/cmake/stm32cubemx/../../Drivers/BSP/STM32WLxx_Nucleo"
 				},
 				{
 					"backtrace" : 3,
-					"path" : "D:/Mereni_hladiy/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32WLxx/Include"
+					"isSystem" : true,
+					"path" : "D:/Mereni_hladiny/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32WLxx/Include"
 				},
 				{
 					"backtrace" : 3,
-					"path" : "D:/Mereni_hladiy/cmake/stm32cubemx/../../Middlewares/Third_Party/SubGHz_Phy/radio_driver"
+					"isSystem" : true,
+					"path" : "D:/Mereni_hladiny/cmake/stm32cubemx/../../Middlewares/Third_Party/SubGHz_Phy/radio_driver"
 				},
 				{
 					"backtrace" : 3,
-					"path" : "D:/Mereni_hladiy/cmake/stm32cubemx/../../Drivers/CMSIS/Include"
+					"isSystem" : true,
+					"path" : "D:/Mereni_hladiny/cmake/stm32cubemx/../../Drivers/CMSIS/Include"
 				}
 			],
 			"language" : "ASM",
@@ -453,7 +501,7 @@
 				"role" : "flags"
 			},
 			{
-				"fragment" : "-mcpu=cortex-m4 -mthumb -mfloat-abi=soft  -T \"D:/Mereni_hladiy/STM32WL55XX_FLASH_CM4.ld\" --specs=nano.specs -Wl,-Map=Mereni_hladiny.map -Wl,--gc-sections -Wl,--print-memory-usage",
+				"fragment" : "-mcpu=cortex-m4 -mthumb -mfloat-abi=soft  -T \"D:/Mereni_hladiny/STM32WL55XX_FLASH_CM4.ld\" --specs=nano.specs -Wl,-Map=Mereni_hladiny.map -Wl,--gc-sections -Wl,--print-memory-usage",
 				"role" : "flags"
 			},
 			{

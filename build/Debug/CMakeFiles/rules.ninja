@@ -92,7 +92,7 @@ rule C_COMPILER__SubGHz_Phy_unscanned_Debug
 # Rule for re-running cmake.
 
 rule RERUN_CMAKE
-  command = C:\Users\radek\AppData\Local\stm32cube\bundles\cmake\4.3.1+st.1\bin\cmake.exe --regenerate-during-build -SD:\Mereni_hladiy -BD:\Mereni_hladiy\build\Debug
+  command = C:\Users\radek\AppData\Local\stm32cube\bundles\cmake\4.3.1+st.1\bin\cmake.exe --regenerate-during-build -SD:\Mereni_hladiny -BD:\Mereni_hladiny\build\Debug
   description = Re-running CMake...
   generator = 1
 
