@@ -31,17 +31,20 @@ void App::init()
 	DataTransmit::GetInstance().Init(&Radio);
 	
 	printf("Init device\r");
-}
+
 	
+	if(!param_storage.ReadRecord(Param)){
+		led_controller.SetMode(LedController::Leds::Red, LedController::LedMode::Blink);
+		printf("Calibration error\n");	
+	}
+	else{
+		printf("Calibration loaded from flash: L_level=%d M_level=%d H_level=%d\n", Param["L_level"], Param["M_level"], Param["H_level"]);
+		CalibrationError = false;
+	}
+}
 
 void App::loop()
 {
-	/* inializace driveru  tlacitek */
-	ButtonMonitor button_monitor( 
-    []()->bool { return (static_cast<bool>(HAL_GPIO_ReadPin(BT_1_GPIO_Port, BT_1_Pin) == GPIO_PIN_RESET)); },
-    []()->bool { return (static_cast<bool>(HAL_GPIO_ReadPin(BT_2_GPIO_Port, BT_2_Pin) == GPIO_PIN_RESET)); },
-    []()->bool { return (static_cast<bool>(HAL_GPIO_ReadPin(BT_3_GPIO_Port, BT_3_Pin) == GPIO_PIN_RESET)); }
-	);
 
 	for(;;){
 
@@ -98,6 +101,9 @@ void App::loop()
 				printf("Received unknown packet type\n");
 			}
 		}
+
+		/* led control */
+		led_controller.Run();
 		
 	}
 

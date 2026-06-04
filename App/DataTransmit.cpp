@@ -147,7 +147,7 @@ void DataTransmit::Init(const struct Radio_s *Radio_,bool MasterMode_){
 	if(MasterMode == false){
 		TimerInit( &CadTimer,RadioCadTimeoutIrq );
 		TimerSetValue( &CadTimer,CAD_sample );
-		//TimerStart( &CadTimer );	
+		TimerStart( &CadTimer );	
 	}
 	DataAvailable = false;		
 	DataOverload = false;		
