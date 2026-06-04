@@ -11,6 +11,7 @@
 #include "Board_hw_specific.h"
 #include "radio.h"	
 #include <span>
+#include "ButtonControl.hpp"
 
 constexpr uint32_t LEVEL_L = (1u << 0);
 constexpr uint32_t LEVEL_UNDER_M = (1u << 1);
@@ -25,18 +26,45 @@ SRF05 EchoDriver(SRF05_PORT[TRIGER],SRF05_PIN[TRIGER],SRF05_PORT[ECHO],SRF05_PIN
 
 void App::init()
 {
-    // inicializace (např. periferií)
+    // inicializace echo driveru a datového přenosu
 	EchoDriver.setModeMedian(10);
 	DataTransmit::GetInstance().Init(&Radio);
+	
 	printf("Init device\r");
 }
 	
 
 void App::loop()
 {
+	/* inializace driveru  tlacitek */
+	ButtonMonitor button_monitor( 
+    []()->bool { return (static_cast<bool>(HAL_GPIO_ReadPin(BT_1_GPIO_Port, BT_1_Pin) == GPIO_PIN_RESET)); },
+    []()->bool { return (static_cast<bool>(HAL_GPIO_ReadPin(BT_2_GPIO_Port, BT_2_Pin) == GPIO_PIN_RESET)); },
+    []()->bool { return (static_cast<bool>(HAL_GPIO_ReadPin(BT_3_GPIO_Port, BT_3_Pin) == GPIO_PIN_RESET)); }
+	);
+
 	for(;;){
 
-		
+		/* Kontrola stisknutých tlačítek */
+		if(uint8_t button = button_monitor.ScanButton()) {
+			printf("Button %u event: ", button);
+			switch (button_monitor.GetLastEvent(button)) {
+				case ButtonEvent::PRESSED:
+					printf("PRESSED\n");
+					break;
+				case ButtonEvent::HELD:
+					printf("HELD\n");
+					break;
+				case ButtonEvent::RELEASED:
+					printf("RELEASED\n");
+					break;
+				default:
+					printf("NONE\n");
+					break;
+			}
+		}
+
+		/* Kontrola přijatých dat */
 		if(DataTransmit::DataAvailable){
 			DataTransmit::DataAvailable = false; // Reset flag for next reception
 			if(DataTransmit::GetInstance().GetReceivedDataType() == Packet::Level_request){
@@ -70,6 +98,7 @@ void App::loop()
 				printf("Received unknown packet type\n");
 			}
 		}
+		
 	}
 
 }

@@ -1,137 +1,105 @@
 #include "ButtonControl.hpp"
-#include "timers.h"
-#include "Common.hpp"
-#include "TaskPriorities.hpp" 
-#include "WdtSystemTask.hpp"
 
-QueueHandle_t gButtonQueue = nullptr;
-
-
-void SendButtonEvent(uint8_t id, ButtonEventType evt){
-    id+=1;
-    MessageButton msg{
-        .buttonId = id,
-        .event = evt
-    };
-
-    xQueueSend(
-        gButtonQueue,
-        &msg,
-        0);
-        #if APP_DEBUG_PRINT
-        printf("Send  button event %d for button %d\r\n",static_cast<int>(evt) ,static_cast<int>(id));
-        #endif 
+ButtonMonitor::ButtonMonitor(ButtonReadFunc read_btn1, ButtonReadFunc read_btn2,
+                             ButtonReadFunc read_btn3)
+    : read_funcs{read_btn1, read_btn2, read_btn3} {
+  // Initialize all button states
+  for (auto &state : button_states) {
+    state.last_event = ButtonEvent::NONE;
+    state.press_start_time = 0;
+    state.is_pressed = false;
+    state.hold_event_sent = false;
+    state.prev_pressed = false;
+  }
 }
 
-ButtonContext gButtons[3] ={
-    { BT_1_GPIO_Port, BT_1_Pin },
-    { BT_2_GPIO_Port, BT_2_Pin },
-    { BT_3_GPIO_Port, BT_3_Pin }
-};
-
-bool IsButtonPressed(const ButtonContext& btn){
-    return HAL_GPIO_ReadPin(btn.port, btn.pin) == GPIO_PIN_RESET;
-}
-
-template<typename ReadFunc>
-void ProcessButton(
-    ButtonContext& btn,
-    uint8_t id,
-    ReadFunc&& readButton){
-    const TickType_t now = xTaskGetTickCount();
-    const bool pressed = readButton(btn);
-
-    switch (btn.state){
-        case ButtonState::Idle:{
-            if (pressed){
-                btn.timestamp = now;
-                btn.state = ButtonState::DebouncePress;
-            }
-            break;
-        }
-
-        case ButtonState::DebouncePress:{
-            if (!pressed){
-                btn.state = ButtonState::Idle;
-            }
-            else if ((now - btn.timestamp) >= pdMS_TO_TICKS(DEBOUNCE_PRESS_MS)){
-                SendButtonEvent(id, ButtonEventType::Press);
-                btn.longPressSent = false;
-                btn.state = ButtonState::Pressed;
-            }
-            break;
-        }
-
-        case ButtonState::Pressed:{
-            if (!pressed){
-                btn.timestamp = now;
-                btn.state = ButtonState::DebounceRelease;
-            }
-            else if (!btn.longPressSent &&
-                     ((now - btn.timestamp) >= pdMS_TO_TICKS(LONG_PRESS_MS))){
-                SendButtonEvent(id, ButtonEventType::LongPress);
-
-                btn.longPressSent = true;
-                btn.state = ButtonState::LongPressed;
-            }
-            break;
-        }
-
-        case ButtonState::LongPressed:{
-            if (!pressed){
-                btn.timestamp = now;
-                btn.state = ButtonState::DebounceRelease;
-            }
-            break;
-        }
-
-        case ButtonState::DebounceRelease:{
-            if (pressed){
-                btn.state = btn.longPressSent
-                    ? ButtonState::LongPressed
-                    : ButtonState::Pressed;
-            }
-            else if ((now - btn.timestamp) >= pdMS_TO_TICKS(DEBOUNCE_RELEASE_MS)){
-                SendButtonEvent(id, ButtonEventType::Release);
-
-                btn.state = ButtonState::Idle;
-            }
-            break;
-        }
+uint8_t ButtonMonitor::ScanButton() {
+  // Scan all 3 buttons
+  for (uint8_t i = 0; i < NUM_BUTTONS; ++i) {
+    if (UpdateButtonState(i)) {
+      // Return button number (1-3) if state change detected
+      return i + 1;
     }
+  }
+  // No state change detected
+  return 0;
 }
 
-/* task buttons monitor */
-void ButtonMonitorTask(void*){
-    const TickType_t period =
-        pdMS_TO_TICKS(POLL_PERIOD_MS);
+bool ButtonMonitor::ReadButtonStatus(uint8_t button) {
+  // Validate button number (1-3)
+  if (button < 1 || button > NUM_BUTTONS) {
+    return false;
+  }
 
-    TickType_t lastWake =
-        xTaskGetTickCount();
+  // Button is 1-indexed externally, 0-indexed internally
+  return ReadButtonRaw(button - 1);
+}
 
-    for (;;){
-        for (uint8_t i = 0; i < 3; i++){
-           ProcessButton(
-        gButtons[i],
-            i,
-            [](const ButtonContext& btn) -> bool{
-                return HAL_GPIO_ReadPin(btn.port, btn.pin) == GPIO_PIN_RESET;});
-        }
-        vTaskDelayUntil(&lastWake, period);
-        gAliveMask.fetch_or(TASK_BTN_DRIVER_BIT);  
+ButtonEvent ButtonMonitor::GetLastEvent(uint8_t button) const {
+  // Validate button number (1-3)
+  if (button < 1 || button > NUM_BUTTONS) {
+    return ButtonEvent::NONE;
+  }
+
+  return button_states[button - 1].last_event;
+}
+
+bool ButtonMonitor::ReadButtonRaw(uint8_t button) {
+  // Validate button index (0-2)
+  if (button >= NUM_BUTTONS) {
+    return false;
+  }
+
+  return read_funcs[button]();
+}
+
+bool ButtonMonitor::UpdateButtonState(uint8_t button) {
+  // Get current physical state
+  bool current_pressed = ReadButtonRaw(button);
+  ButtonState &state = button_states[button];
+
+  uint32_t current_time = HAL_GetTick();
+  bool state_changed = false;
+
+  // Detect state change (pressed -> released or vice versa)
+  if (current_pressed != state.prev_pressed) {
+    state.prev_pressed = current_pressed;
+    state_changed = true;
+
+    if (current_pressed) {
+      // Button just pressed
+      state.press_start_time = current_time;
+      state.hold_event_sent = false;
+      state.last_event = ButtonEvent::NONE;
+    } else {
+      // Button just released
+      uint32_t press_duration = current_time - state.press_start_time;
+
+      if (state.hold_event_sent) {
+        // Hold event was already sent during the press
+        // Now send release event
+        state.last_event = ButtonEvent::RELEASED;
+      } else if (press_duration >= PRESS_TIMEOUT_MS) {
+        // Button was held for at least 100ms
+        state.last_event = ButtonEvent::PRESSED;
+      } else {
+        // Button was pressed too briefly
+        state.last_event = ButtonEvent::NONE;
+        state_changed = false; // Don't report as change if press was too short
+      }
     }
-}
+  } else if (current_pressed && !state.hold_event_sent) {
+    // Button is still pressed and hold event not yet sent
+    uint32_t press_duration = current_time - state.press_start_time;
 
-void ButtonControlInit(void){
-    
-    gButtonQueue = xQueueCreate(QueueLength, sizeof(Message));
-    configASSERT(gButtonQueue != nullptr);
+    if (press_duration >= HOLD_TIMEOUT_MS) {
+      // Hold timeout reached
+      state.hold_event_sent = true;
+      state.last_event = ButtonEvent::HELD;
+      state_changed = true;
+    }
+  }
 
-    xTaskCreate(
-    ButtonMonitorTask,
-    "Buttons",
-    512,
-    nullptr,
-    BUTTON_MONITOR_TASK_PRIOR, 
-    nullptr);
+  state.is_pressed = current_pressed;
+  return state_changed;
 }
