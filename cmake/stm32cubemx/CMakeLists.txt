@@ -36,12 +36,15 @@ set(MX_Application_Src
     ${CMAKE_CURRENT_SOURCE_DIR}/../../SubGHz_Phy/Target/radio_board_if.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../../SubGHz_Phy/App/app_subghz_phy.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../../SubGHz_Phy/App/subghz_phy_app.c
-     ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/Timer_funct.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/Timer_funct.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../../App/app.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../../App/DataTransmit.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../../App/Packet.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../../App/SRF05.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../App/FlashStorage.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/main.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../App/LedDriver.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../App/ButtonControl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/gpio.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/adc.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/crc.c

@@ -32,7 +32,6 @@ void App::init()
 }
 	
 
-
 void App::loop()
 {
 	for(;;){
@@ -60,6 +59,7 @@ void App::loop()
 			}
 			else if(DataTransmit::GetInstance().GetReceivedDataType() == Packet::Battery_request){
 				printf("Received Battery Request\n");
+				
 				// Simulace úrovně baterie (např. 75%)
 				float battery_level = 75.0f;
 				std::vector<uint8_t> battery_payload(sizeof(battery_level));
@@ -70,20 +70,6 @@ void App::loop()
 				printf("Received unknown packet type\n");
 			}
 		}
-		/*
-    // tvoje hlavní logika
-	BSP_LED_Toggle(LED_GREEN);
-	float value = EchoDriver.getCentimeter();
-	if(value==0){
-		printf("Chyba mereni\r\n");
-
-	}
-	else {
-		printf("Vzdalenost %d cm\r\n", static_cast<int>(value));
-	}
-	BSP_LED_Toggle(LED_GREEN);
-	HAL_Delay(500);
-	*/
 	}
 
 }
