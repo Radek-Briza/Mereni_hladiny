@@ -56,7 +56,7 @@ extern "C" {
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
-
+#define SLEEP_ENABLE 0
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/

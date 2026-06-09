@@ -48,6 +48,20 @@ void MX_CRC_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN CRC_Init 2 */
+    CRC_HandleTypeDef modbus_crc = hcrc;
+    modbus_crc.Init.DefaultPolynomialUse = DEFAULT_POLYNOMIAL_DISABLE;
+    modbus_crc.Init.GeneratingPolynomial = 0x8005U;            // CRC-16/MODBUS polynomial
+    modbus_crc.Init.CRCLength = CRC_POLYLENGTH_16B;
+    modbus_crc.Init.DefaultInitValueUse = DEFAULT_INIT_VALUE_DISABLE;
+    modbus_crc.Init.InitValue =  0xFFFFu;                      // MODBUS initial value
+    modbus_crc.Init.InputDataInversionMode = CRC_INPUTDATA_INVERSION_BYTE;
+    modbus_crc.Init.OutputDataInversionMode = CRC_OUTPUTDATA_INVERSION_ENABLE;
+    modbus_crc.InputDataFormat = CRC_INPUTDATA_FORMAT_BYTES;
+ if (HAL_CRC_Init(&modbus_crc) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
 
   /* USER CODE END CRC_Init 2 */
 

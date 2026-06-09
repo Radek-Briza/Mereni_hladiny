@@ -21,14 +21,13 @@
 
 #include "main.h"  
 #include "sys_app.h"
-
 #include "adc.h"
 #include "crc.h"
 #include "dma.h"
 #include "app_subghz_phy.h"  
 #include "tim.h"
-#include "wwdg.h"
 #include "gpio.h"
+#include "iwdg.h"
 #include "stm32wlxx_nucleo.h"   
 #include <stdio.h>
  
@@ -106,23 +105,18 @@ int main(void)
   MX_DMA_Init();
   MX_CRC_Init();
   MX_ADC_Init();
- // MX_WWDG_Init();
-  //MX_SubGHz_Phy_Init();
+  MX_IWDG_Init();
+
   MX_TIM1_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
-  App Application;
+  
   /* USER CODE END 2 */
-
+  
   /* Initialize leds */
   BSP_LED_Init(LED_BLUE);
   BSP_LED_Init(LED_GREEN);
   BSP_LED_Init(LED_RED);
-
-  /* Initialize USER push-button, will be used to trigger an interrupt each time it's pressed.*/
- // BSP_PB_Init(BUTTON_SW1, BUTTON_MODE_EXTI);
- // BSP_PB_Init(BUTTON_SW2, BUTTON_MODE_EXTI);
- // BSP_PB_Init(BUTTON_SW3, BUTTON_MODE_EXTI);
 
   /* Initialize COM1 port (115200, 8 bits (7-bit data + 1 stop bit), no parity */
   BspCOMInit.BaudRate   = 115200;
@@ -135,12 +129,9 @@ int main(void)
     Error_Handler();
   }
 
-
   printf("\rMereni hladiny ver 1.03 \r\n") ;
-
-
-  //puts("puts HELLO\r");
   /* Infinite loop */
+  App Application;
   Application.init();
   Application.loop();
 

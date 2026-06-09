@@ -44,6 +44,8 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32wlxx_hal.h"
+#include "stdio.h"
+
 
 /** @addtogroup STM32WLxx_HAL_Driver
   * @{

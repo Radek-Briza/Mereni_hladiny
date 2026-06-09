@@ -71,6 +71,11 @@ bool FlashParameterStorage::LoadFromFlash(){
 
     recordCount_ = hdr->recordCount;
 
+    /* print loaded records */
+    for(const auto& [name,value] : cache_){
+        printf("Loaded record: %s = %d\n", name.c_str(), value);
+    }
+
     return true;
 }
 

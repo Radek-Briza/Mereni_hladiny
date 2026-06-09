@@ -37,7 +37,7 @@ uint16_t calculate_crc(std::span<uint8_t> data,uint16_t initial_value = 0xFFFFu)
         return initial_value;
     }
 
-    printf("Calculating CRC, initial value: 0x%04X for data: ", initial_value);
+    printf("Calculatin CRC, initial value: 0x%04X for data: ", initial_value);
     for (auto const &byte : data) {
         printf("%02X ", byte);
     }
@@ -128,7 +128,10 @@ bool Packet::CreatePacket(PacketType Type ){
  std::array<uint8_t, Packet::max_packet_size> m_payload{};
  std::ranges::copy(Payload, m_payload.data());
  
-
+ if(m_data_length > Packet::max_payload_size){
+    printf("Data length exceeds maximum payload size: %u\n", m_data_length);
+    return false; // Data length exceeds maximum payload size
+ }
  printf("Packet ID: %u\n", m_paket_ID);
  printf("Data Length: %u\n", m_data_length);       
  printf("Payload: ");
