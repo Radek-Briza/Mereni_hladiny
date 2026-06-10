@@ -23,12 +23,13 @@
 #include "stm32_lpm_if.h"
 
 /* USER CODE BEGIN Includes */
-
+#include "main.h"
 /* USER CODE END Includes */
 
 /* External variables ---------------------------------------------------------*/
 /* USER CODE BEGIN EV */
-
+  extern TIM_HandleTypeDef htim1;
+	extern TIM_HandleTypeDef htim2;
 /* USER CODE END EV */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -68,7 +69,7 @@ const struct UTIL_LPM_Driver_s UTIL_PowerDriver =
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN PFP */
-
+extern void SystemClock_Config(void);
 /* USER CODE END PFP */
 
 /* Exported functions --------------------------------------------------------*/
@@ -90,14 +91,19 @@ void PWR_ExitOffMode(void)
 void PWR_EnterStopMode(void)
 {
   /* USER CODE BEGIN EnterStopMode_1 */
-
+  HAL_TIM_Base_Stop(&htim1);
+	HAL_TIM_Base_Stop(&htim2);
+  HAL_PWR_EnterSTOPMode(PWR_MAINREGULATOR_ON,PWR_STOPENTRY_WFI);
   /* USER CODE END EnterStopMode_1 */
 }
 
 void PWR_ExitStopMode(void)
 {
   /* USER CODE BEGIN ExitStopMode_1 */
-
+  SystemClock_Config();
+  HAL_TIM_Base_Start(&htim1);
+	HAL_TIM_Base_Start(&htim2);
+  
   /* USER CODE END ExitStopMode_1 */
 }
 
@@ -111,7 +117,7 @@ void PWR_EnterSleepMode(void)
 void PWR_ExitSleepMode(void)
 {
   /* USER CODE BEGIN ExitSleepMode_1 */
-
+  
   /* USER CODE END ExitSleepMode_1 */
 }
 

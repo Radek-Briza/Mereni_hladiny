@@ -61,7 +61,6 @@ COM_InitTypeDef BspCOMInit;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
-void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -105,7 +104,9 @@ int main(void)
   MX_DMA_Init();
   MX_CRC_Init();
   MX_ADC_Init();
+  #if WDT_ENABLE
   MX_IWDG_Init();
+  #endif
 
   MX_TIM1_Init();
   MX_TIM2_Init();

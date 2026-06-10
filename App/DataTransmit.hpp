@@ -56,7 +56,7 @@ private:
 
 	const uint32_t MaxPayloadSize = Packet::max_packet_size;
 	static const struct Radio_s *RadioDriver;
-	static const uint32_t CAD_sample = 200U; /* ms*/
+	static const uint32_t CAD_sample = 2000U; /* ms*/
 	static  const uint32_t ResponseTimeout = 5000U; /* ms*/
 	static RadioEvents_t RadioEvents;
 	static TimerEvent_t CadTimer;

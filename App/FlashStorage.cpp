@@ -73,7 +73,7 @@ bool FlashParameterStorage::LoadFromFlash(){
 
     /* print loaded records */
     for(const auto& [name,value] : cache_){
-        printf("Loaded record: %s = %d\n", name.c_str(), value);
+        printf("Loaded record: %s = %d\n", name.c_str(), static_cast<int>(value));
     }
 
     return true;

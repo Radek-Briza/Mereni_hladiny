@@ -212,6 +212,8 @@ void App::loop()
 			DataTransmit::DataAvailable = false; // Reset flag for next reception
 			if(DataTransmit::GetInstance().GetReceivedDataType() == Packet::Level_request && CalibrationRun==false){
 				printf("Received Level Request\n");
+				led_controller.SetMode(LedController::Leds::Green, LedController::LedMode::OneShot);
+				
 				GetLevel = static_cast<uint16_t>(EchoDriver.getCentimeter());
 				uint16_t status = 0;
 
@@ -244,10 +246,12 @@ void App::loop()
 
 		/* led control */
 		led_controller.Run();
+		#if WDT_ENABLE
 		HAL_IWDG_Refresh(&hiwdg);
+		#endif
 		#if SLEEP_ENABLE
 		if(CalibrationRun==false ){
-			Sleep(1000);
+			Sleep(0);
 		}
 		#endif
 	}
@@ -260,7 +264,7 @@ void App::loop()
  * This function configures an RTC alarm and enters STOP mode for ultra-low power operation.
  * The processor resumes execution immediately after the RTC alarm fires or when another
  * interrupt source (e.g., button press) triggers wakeup.
- *
+ * @param durationMs Sleep duration in milliseconds. If set to 0, the device wait indefinitely for an interrupt (OFF mode).
  * @note STOP Mode consumption: ~1.5 µA (core inactive, RTC and peripherals remain active)
  * @note Power domains maintained: VDDCORE (1.2V) and VDD (3.3V)
  * @note All clocks halted except RTC
@@ -268,18 +272,17 @@ void App::loop()
  */
 void App::Sleep(uint32_t durationMs)
 {
-	extern TIM_HandleTypeDef htim1;
-	extern TIM_HandleTypeDef htim2;
-	/* stop timer 1 and timer 2 */
-	 HAL_TIM_Base_Stop(&htim1);
-	 HAL_TIM_Base_Stop(&htim2);
 
     if (durationMs == 0) {
-        // Zero duration enters deep OFF mode (not recommended for this use case)
-        printf("Sleep: Zero duration, entering minimal standby.\n");
-        UTIL_LPM_SetOffMode(1, UTIL_LPM_ENABLE);
-        UTIL_LPM_EnterLowPower();
+        // Force STOP mode by allowing Stop mode and disallowing OFF mode
+		printf("Sleep: Entering STOP mode indefinitely (waiting for interrupt)...\n");
+        UTIL_LPM_SetStopMode(1, UTIL_LPM_ENABLE);
         UTIL_LPM_SetOffMode(1, UTIL_LPM_DISABLE);
+       // Enter STOP mode - CPU halts here
+        UTIL_LPM_EnterLowPower();
+		printf("Exiting STOP mode.\n");
+	    // Restore OFF mode allowance for later low-power transitions
+        UTIL_LPM_SetOffMode(1, UTIL_LPM_ENABLE);
     } else {
         // Convert milliseconds to RTC ticks and configure alarm
         uint32_t ticks = TIMER_IF_Convert_ms2Tick(durationMs);
@@ -288,32 +291,23 @@ void App::Sleep(uint32_t durationMs)
               static_cast<unsigned long>(ticks));
 
         // Start RTC alarm for wakeup
-		/*
-        UTIL_TIMER_Status_t timer_status = TIMER_IF_StartTimer(ticks);
+		UTIL_TIMER_Status_t timer_status = TIMER_IF_StartTimer(ticks);
         if (timer_status != UTIL_TIMER_OK) {
             printf("Sleep: Failed to start timer. Status: %d\n", timer_status);
             return;
         }
-	*/
-
-        // Enable STOP mode and enter low-power state
+	
+        // Force STOP mode by allowing Stop mode and disallowing OFF mode
         UTIL_LPM_SetStopMode(1, UTIL_LPM_ENABLE);
-        
+        UTIL_LPM_SetOffMode(1, UTIL_LPM_DISABLE);
+
         // Enter STOP mode - CPU halts here
         UTIL_LPM_EnterLowPower();
-        
+
         // Execution resumes here after RTC wakeup
-        printf("Sleep: Wakeup occurred. Exiting STOP mode.\n");
+        printf("Exiting STOP mode.\n");
 
-        // Stop the RTC alarm if still active
-        
-
-		/* start timer 1 and timer 2 */
-		HAL_TIM_Base_Start(&htim1);
-		HAL_TIM_Base_Start(&htim2);
-        
-        // Disable STOP mode to allow other low-power modes
-        UTIL_LPM_SetStopMode(1, UTIL_LPM_DISABLE);
+        // Restore OFF mode allowance for later low-power transitions
+        UTIL_LPM_SetOffMode(1, UTIL_LPM_ENABLE);
     }
 }
-
