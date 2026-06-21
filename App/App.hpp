@@ -112,7 +112,7 @@ private:
     /**
      * @brief Last measured level in centimeters.
      */
-    uint16_t GetLevel;
+    uint16_t Distance;
 
     /**
      * @brief Indicates whether calibration data is invalid or missing.
