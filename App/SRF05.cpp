@@ -135,26 +135,38 @@ uint32_t SRF05::getMillimeter(){
 
 
 float SRF05::getCentimeter(){
-  return _speedOfSound * getTime() * 0.5e-4;
+  HAL_GPIO_WritePin(SENSOR_PWR_EN_GPIO_Port, SENSOR_PWR_EN_Pin, GPIO_PIN_SET);
+  HAL_Delay(10); // Allow sensor to power up
+  float distance = _speedOfSound * getTime() * 0.5e-4;
+  HAL_GPIO_WritePin(SENSOR_PWR_EN_GPIO_Port, SENSOR_PWR_EN_Pin, GPIO_PIN_RESET);
+  return distance;
+   
 }
 
-
 float SRF05::getMeter(){
-  return _speedOfSound * getTime() * 0.5e-6;
+   HAL_GPIO_WritePin(SENSOR_PWR_EN_GPIO_Port, SENSOR_PWR_EN_Pin, GPIO_PIN_SET);
+   HAL_Delay(10); // Allow sensor to power up
+   float distance = _speedOfSound * getTime() * 0.5e-6;
+   HAL_GPIO_WritePin(SENSOR_PWR_EN_GPIO_Port, SENSOR_PWR_EN_Pin, GPIO_PIN_RESET);
+  return distance;
+  
 }
 
 
 float SRF05::getInch(){
+
   return _speedOfSound * getTime() * 1.9685e-5;
 }
 
 
 float SRF05::getFeet(){
+  
   return _speedOfSound * getTime() * 1.64042e-6;
 }
 
 
 float SRF05::getYards(){
+   
   return _speedOfSound * getTime() * 0.54681e-6;
 }
 

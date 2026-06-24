@@ -85,6 +85,8 @@ void SystemClock_Config(void);
 #define BT_3_GPIO_Port GPIOC
 #define BT_2_Pin GPIO_PIN_1
 #define BT_2_GPIO_Port GPIOA
+#define SENSOR_PWR_EN_Pin GPIO_PIN_1
+#define SENSOR_PWR_EN_GPIO_Port GPIOC
 
 /* USER CODE BEGIN Private defines */
 

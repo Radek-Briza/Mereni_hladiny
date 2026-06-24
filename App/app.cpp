@@ -214,12 +214,20 @@ void App::loop()
 				printf("Received Level Request\n");
 				led_controller.SetMode(LedController::Leds::Green, LedController::LedMode::OneShot);
 				
-				GetLevel = static_cast<uint16_t>(EchoDriver.getCentimeter());
+				auto GetDistance = static_cast<uint16_t>(EchoDriver.getCentimeter());
+				printf("Measured distance: %u cm\n", GetDistance);
 				uint16_t status = 0;
 
-				if(GetLevel <= LEVEL_L_CM ) status  |=LEVEL_L ;
-				if(GetLevel < LEVEL_M_CM  && GetLevel >  LEVEL_L_CM) status   |=LEVEL_UNDER_M ;
-				if(GetLevel >= LEVEL_H_CM ) status  |=LEVEL_H ;
+				if(Param["L_level"]==0){
+					 GetLevel = 0;
+					}else {
+						GetLevel = Param["L_level"] - GetDistance;
+					}
+						
+
+				if(GetDistance >= Param["L_level"] ) status  |=LEVEL_L ;
+				if(GetDistance > Param["M_level"]  && GetDistance <  Param["L_level"]) status   |=LEVEL_UNDER_M ;
+				if(GetDistance <= Param["H_level"] ) status  |=LEVEL_H ;
 				printf("Measured level: %u cm status :%u\n", GetLevel, status );
     
 
