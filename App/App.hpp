@@ -115,6 +115,11 @@ private:
     uint16_t GetLevel;
 
     /**
+     * @brief Last measured distance in centimeters from top barrel .
+     */
+    uint16_t GetDistance = 0; /**< Last measured distance in centimeters. */
+
+    /**
      * @brief Indicates whether calibration data is invalid or missing.
      */
     bool CalibrationError = true;

@@ -96,9 +96,9 @@ bool App::CalibrationRoutime (ButtonAssignment button){
 				&& 	button == ButtonAssignment::BUTTON_STORE
 				&&  Event == ButtonEvent::PRESSED)
 				{
-					if(Mode == CalibrationMode::MODE_CALIBRATION_L)  L_value = Distance;
-					if(Mode == CalibrationMode::MODE_CALIBRATION_M)  M_value = Distance;
-					if(Mode == CalibrationMode::MODE_CALIBRATION_H)  H_value = Distance;
+					if(Mode == CalibrationMode::MODE_CALIBRATION_L)  L_value = GetDistance;
+					if(Mode == CalibrationMode::MODE_CALIBRATION_M)  M_value = GetDistance;
+					if(Mode == CalibrationMode::MODE_CALIBRATION_H)  H_value = GetDistance;
 					led_controller.SetMode(LedController::Leds::Red,LedController::LedMode::OneShot);
 					return true;
 				}
@@ -202,8 +202,8 @@ void App::loop()
 		if(CalibrationRun== true){
 			if(HAL_GetTick() >  CalibrationTimeStamp+CALIBRATION_RUN_PERIODE){ 
 				 CalibrationTimeStamp = HAL_GetTick();
-				 Distance = static_cast<uint16_t>(EchoDriver.getCentimeter());
-				 printf("Calibration mode, measured level: %u cm\n", Distance);
+				 GetDistance = static_cast<uint16_t>(EchoDriver.getCentimeter());
+				 printf("Calibration mode, measured level: %u cm\n", GetDistance);
 			}
 		}
 
