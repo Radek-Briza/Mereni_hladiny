@@ -96,9 +96,9 @@ bool App::CalibrationRoutime (ButtonAssignment button){
 				&& 	button == ButtonAssignment::BUTTON_STORE
 				&&  Event == ButtonEvent::PRESSED)
 				{
-					if(Mode == CalibrationMode::MODE_CALIBRATION_L)  L_value = GetLevel;
-					if(Mode == CalibrationMode::MODE_CALIBRATION_M)  M_value = GetLevel;
-					if(Mode == CalibrationMode::MODE_CALIBRATION_H)  H_value = GetLevel;
+					if(Mode == CalibrationMode::MODE_CALIBRATION_L)  L_value = Distance;
+					if(Mode == CalibrationMode::MODE_CALIBRATION_M)  M_value = Distance;
+					if(Mode == CalibrationMode::MODE_CALIBRATION_H)  H_value = Distance;
 					led_controller.SetMode(LedController::Leds::Red,LedController::LedMode::OneShot);
 					return true;
 				}
@@ -202,8 +202,8 @@ void App::loop()
 		if(CalibrationRun== true){
 			if(HAL_GetTick() >  CalibrationTimeStamp+CALIBRATION_RUN_PERIODE){ 
 				 CalibrationTimeStamp = HAL_GetTick();
-				 GetLevel = static_cast<uint16_t>(EchoDriver.getCentimeter());
-				 printf("Calibration mode, measured level: %u cm\n", GetLevel);
+				 Distance = static_cast<uint16_t>(EchoDriver.getCentimeter());
+				 printf("Calibration mode, measured level: %u cm\n", Distance);
 			}
 		}
 
@@ -214,7 +214,7 @@ void App::loop()
 				printf("Received Level Request\n");
 				led_controller.SetMode(LedController::Leds::Green, LedController::LedMode::OneShot);
 				
-				auto GetDistance = static_cast<uint16_t>(EchoDriver.getCentimeter());
+				GetDistance = static_cast<uint16_t>(EchoDriver.getCentimeter());
 				printf("Measured distance: %u cm\n", GetDistance);
 				uint16_t status = 0;
 
@@ -233,7 +233,7 @@ void App::loop()
 
 				std::vector<uint8_t> payload(sizeof(GetLevel)+sizeof(status));
 				auto LevelArrea =  std::span{payload}.first(sizeof(GetLevel)); 
-				auto StatusArrea = std::span{payload}.subspan(sizeof(status), sizeof(GetLevel)); 
+				auto StatusArrea = std::span{payload}.subspan(sizeof(GetLevel), sizeof(status)); 
 				std::memcpy(LevelArrea.data(), &GetLevel, sizeof(GetLevel));
 				std::memcpy(StatusArrea.data(),&status, sizeof(status ));
  				DataTransmit::GetInstance().SendData(Packet::Level_response, payload);
