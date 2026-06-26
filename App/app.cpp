@@ -178,8 +178,6 @@ void App::init()
 	adc_reader_.emplace(&hadc, std::span<const AdcReader::ChannelConfig>(adc_channels));
 	AdcReader::AttachIrqHandler(&*adc_reader_);
 	
-	printf("Init device\r");
-
 	if(!param_storage.ReadRecord(Param)){
 		led_controller.SetMode(LedController::Leds::Red, LedController::LedMode::Blink);
 		printf("Calibration error\n");	
@@ -190,6 +188,9 @@ void App::init()
 		  static_cast<int>(Param["H_level"]));
 		CalibrationError = false;
 	}
+
+	DataTransmit::GetInstance().Init(&Radio, false); // Initialize DataTransmit in Master mode
+	printf("Init device\r");
 }
 
 /* main app loop */
