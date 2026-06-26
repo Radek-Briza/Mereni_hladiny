@@ -45,6 +45,7 @@ set(MX_Application_Src
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/main.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../../App/LedDriver.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../../App/ButtonControl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../App/AdcReader.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/gpio.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/adc.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/crc.c

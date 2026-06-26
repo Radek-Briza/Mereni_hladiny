@@ -6,15 +6,18 @@
  */
 #include "main.h"
 #include  "App.hpp"
+#include "adc.h"
 #include "stdlib.h"
 #include "SRF05.h"
 #include "Board_hw_specific.h"
 #include "radio.h"	
 #include <cstdint>
+#include <array>
 #include <span>
 #include <stm32wlxx_hal_uart.h>
 #include "ButtonControl.hpp"
 #include  "DataTransmit.hpp"
+#include "AdcReader.hpp"
 #include "timer_if.h"
 #include "stm32_lpm_if.h"
 #include "stm32_timer.h"
@@ -30,6 +33,11 @@ constexpr uint32_t LEVEL_H_CM =	100;
 extern IWDG_HandleTypeDef hiwdg;
 
 SRF05 EchoDriver(SRF05_PORT[TRIGER],SRF05_PIN[TRIGER],SRF05_PORT[ECHO],SRF05_PIN[ECHO]);
+
+extern "C" void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)
+{
+	AdcReader::HandleInterrupt(hadc);
+}
 
 
 /* level calibration  */
@@ -163,9 +171,12 @@ bool App::CalibrationRoutime (ButtonAssignment button){
 /*init app */
 void App::init()
 {
-    // inicializace echo driveru a datového přenosu
-	EchoDriver.setModeMedian(10);
-	DataTransmit::GetInstance().Init(&Radio);
+	static const std::array<AdcReader::ChannelConfig, 2> adc_channels{{
+		{ADC_CHANNEL_4, 0.5F},
+		{ADC_CHANNEL_5, 0.5F}
+	}};
+	adc_reader_.emplace(&hadc, std::span<const AdcReader::ChannelConfig>(adc_channels));
+	AdcReader::AttachIrqHandler(&*adc_reader_);
 	
 	printf("Init device\r");
 
@@ -214,7 +225,13 @@ void App::loop()
 				printf("Received Level Request\n");
 				led_controller.SetMode(LedController::Leds::Green, LedController::LedMode::OneShot);
 				
-				GetDistance = static_cast<uint16_t>(EchoDriver.getCentimeter());
+				/* start battery measurement */
+				if (adc_reader_ && !adc_reader_->Start()) {
+					printf("ADC start failed\n");
+				}
+
+				/* start distance measurement */
+				GetDistance = static_cast<uint16_t>(EchoDriver.getCentimeter()); 
 				printf("Measured distance: %u cm\n", GetDistance);
 				uint16_t status = 0;
 
@@ -229,20 +246,29 @@ void App::loop()
 				if(GetDistance > Param["M_level"]  && GetDistance <  Param["L_level"]) status   |=LEVEL_UNDER_M ;
 				if(GetDistance <= Param["H_level"] ) status  |=LEVEL_H ;
 				printf("Measured level: %u cm status :%u\n", GetLevel, status );
-    
 
-				std::vector<uint8_t> payload(sizeof(GetLevel)+sizeof(status));
-				auto LevelArrea =  std::span{payload}.first(sizeof(GetLevel)); 
-				auto StatusArrea = std::span{payload}.subspan(sizeof(GetLevel), sizeof(status)); 
+				std::vector<uint8_t> payload(sizeof(GetLevel) + sizeof(status));
+				auto LevelArrea = std::span{payload}.first(sizeof(GetLevel));
+				auto StatusArrea = std::span{payload}.subspan(sizeof(GetLevel), sizeof(status));
 				std::memcpy(LevelArrea.data(), &GetLevel, sizeof(GetLevel));
-				std::memcpy(StatusArrea.data(),&status, sizeof(status ));
- 				DataTransmit::GetInstance().SendData(Packet::Level_response, payload);
+				std::memcpy(StatusArrea.data(), &status, sizeof(status));
+				DataTransmit::GetInstance().SendData(Packet::Level_response, payload);
 			}
 			else if(DataTransmit::GetInstance().GetReceivedDataType() == Packet::Battery_request){
 				printf("Received Battery Request\n");
 				
 				// Simulace úrovně baterie (např. 75%)
-				float battery_level = 75.0f;
+				uint16_t battery_level = 0;
+				if (adc_reader_) {
+					auto result = adc_reader_->GetFinalValue(ADC_CHANNEL_4,  battery_level);
+					if (result == AdcReader::Result::RESULT_OK) {
+						printf("Battery level measured: %u mV\n", battery_level);
+					} else {
+						printf("Battery measurement not available, result code: %d\n", static_cast<int>(result));
+					}
+				} else {
+					printf("ADC reader not initialized\n");
+				}	
 				std::vector<uint8_t> battery_payload(sizeof(battery_level));
 				std::memcpy(battery_payload.data(), &battery_level, sizeof(battery_level));
 				DataTransmit::GetInstance().SendData(Packet::Battery_response, battery_payload);

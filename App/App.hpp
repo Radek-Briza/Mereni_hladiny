@@ -13,8 +13,11 @@
 
 #include "main.h"
 #include "ButtonControl.hpp"
+#include "AdcReader.hpp"
 #include "LedController.hpp"
 #include "FlashStorage.hpp"
+
+#include <optional>
 
 
 
@@ -150,6 +153,11 @@ private:
         {"M_level", 50},
         {"H_level", 10}
     };
+
+    /**
+     * @brief ADC reader instance created during init and used from loop.
+     */
+    std::optional<AdcReader> adc_reader_;
 
     /**
      * @brief Run calibration state machine for the given button event.
