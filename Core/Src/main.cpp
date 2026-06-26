@@ -23,7 +23,6 @@
 #include "sys_app.h"
 #include "adc.h"
 #include "crc.h"
-#include "dma.h"
 #include "app_subghz_phy.h"  
 #include "tim.h"
 #include "gpio.h"
@@ -101,7 +100,6 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_DMA_Init();
   MX_CRC_Init();
   MX_ADC_Init();
   #if WDT_ENABLE

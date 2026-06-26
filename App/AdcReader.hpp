@@ -64,6 +64,12 @@ public:
 	bool Start();
 
 	/**
+	 * @brief Service deferred ADC channel start.
+	 * @note Call periodically from main loop (non-ISR context).
+	 */
+	void Process();
+
+	/**
 	 * @brief Get final converted value for one channel.
 	 * @param channel Requested HAL ADC channel number (ADC_CHANNEL_x).
 	 * @param value_out Reference where converted value is stored.
@@ -117,6 +123,7 @@ private:
 
 	volatile bool conversion_running_ = false;
 	volatile std::size_t active_channel_index_ = 0U;
+	volatile bool deferred_start_pending_ = false;
 
 	bool ConfigureAndStartChannel(std::size_t index);
 	std::size_t FindChannelIndex(uint32_t channel) const;

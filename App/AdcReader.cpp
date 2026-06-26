@@ -46,6 +46,7 @@ bool AdcReader::Start() {
 
   active_channel_index_ = 0U;
   conversion_running_ = true;
+  deferred_start_pending_ = false;
 
   if (!ConfigureAndStartChannel(active_channel_index_)) {
     conversion_running_ = false;
@@ -53,6 +54,19 @@ bool AdcReader::Start() {
   }
 
   return true;
+}
+
+void AdcReader::Process() {
+  if (!conversion_running_ || !deferred_start_pending_) {
+    return;
+  }
+
+  const std::size_t index = active_channel_index_;
+  deferred_start_pending_ = false;
+
+  if (!ConfigureAndStartChannel(index)) {
+    conversion_running_ = false;
+  }
 }
 
 AdcReader::Result AdcReader::GetFinalValue(uint32_t channel, uint16_t &value_out) {
@@ -100,12 +114,12 @@ void AdcReader::AdcCallback(ADC_HandleTypeDef *adc_handle) {
   active_channel_index_ = active_channel_index_ + 1U;
   if (active_channel_index_ >= channel_count_) {
     conversion_running_ = false;
+    deferred_start_pending_ = false;
     return;
   }
 
-  if (!ConfigureAndStartChannel(active_channel_index_)) {
-    conversion_running_ = false;
-  }
+  // Start next channel outside ISR to avoid race with HAL IRQ flag clearing.
+  deferred_start_pending_ = true;
 }
 
 bool AdcReader::ConfigureAndStartChannel(std::size_t index) {

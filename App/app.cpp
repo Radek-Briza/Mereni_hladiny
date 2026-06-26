@@ -172,10 +172,11 @@ bool App::CalibrationRoutime (ButtonAssignment button){
 void App::init()
 {
 	static const std::array<AdcReader::ChannelConfig, 2> adc_channels{{
-		{ADC_CHANNEL_4, 0.5F},
+		{ADC_CHANNEL_4, 2.0F},
 		{ADC_CHANNEL_5, 0.5F}
 	}};
-	adc_reader_.emplace(&hadc, std::span<const AdcReader::ChannelConfig>(adc_channels));
+	adc_reader_.emplace(&hadc, std::span<const AdcReader::ChannelConfig>(adc_channels),
+	3220U);
 	AdcReader::AttachIrqHandler(&*adc_reader_);
 	
 	if(!param_storage.ReadRecord(Param)){
@@ -200,6 +201,20 @@ void App::loop()
 	uint32_t CalibrationTimeStamp=0U;
 
 	for(;;){
+
+		if (adc_reader_) {
+			adc_reader_->Process();
+		}
+
+		if (adc_reader_) {
+			uint16_t battery_level = 0;
+					auto result = adc_reader_->GetFinalValue(ADC_CHANNEL_4,  battery_level);
+					if (result == AdcReader::Result::RESULT_OK) {
+						printf("Battery level measured: %u mV\n", battery_level);
+					} 
+				} else {
+					printf("ADC reader not initialized\n");
+				}	
 
 		/* Kontrola stisknutých tlačítek */
 		auto button = static_cast<ButtonAssignment>(button_monitor.ScanButton());
