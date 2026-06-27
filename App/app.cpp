@@ -29,6 +29,8 @@ constexpr uint32_t LEVEL_H = (1u << 2);
 constexpr uint32_t LEVEL_L_CM =	10;
 constexpr uint32_t LEVEL_M_CM =	30;
 constexpr uint32_t LEVEL_H_CM =	100;
+constexpr uint16_t BATTERY_LOW_THRESHOLD = 3000; // 3.0V
+constexpr uint16_t BATTERY_HIGH_THRESHOLD = 4200; // 4.2V
 
 extern IWDG_HandleTypeDef hiwdg;
 
@@ -202,20 +204,6 @@ void App::loop()
 
 	for(;;){
 
-		if (adc_reader_) {
-			adc_reader_->Process();
-		}
-
-		if (adc_reader_) {
-			uint16_t battery_level = 0;
-					auto result = adc_reader_->GetFinalValue(ADC_CHANNEL_4,  battery_level);
-					if (result == AdcReader::Result::RESULT_OK) {
-						printf("Battery level measured: %u mV\n", battery_level);
-					} 
-				} else {
-					printf("ADC reader not initialized\n");
-				}	
-
 		/* Kontrola stisknutých tlačítek */
 		auto button = static_cast<ButtonAssignment>(button_monitor.ScanButton());
 		if(button != ButtonAssignment::NO_BUTTON) {
@@ -273,20 +261,26 @@ void App::loop()
 			else if(DataTransmit::GetInstance().GetReceivedDataType() == Packet::Battery_request){
 				printf("Received Battery Request\n");
 				
-				// Simulace úrovně baterie (např. 75%)
-				uint16_t battery_level = 0;
+				/* start battery measurement */
+				uint16_t get_battery_level = 0;
+				uint8_t battery = 0; // Variable to hold battery level percentage
+				
 				if (adc_reader_) {
-					auto result = adc_reader_->GetFinalValue(ADC_CHANNEL_4,  battery_level);
+					adc_reader_->Process(); // Ensure ADC processing is done before reading
+					auto result = adc_reader_->GetFinalValue(ADC_CHANNEL_4,  get_battery_level);
 					if (result == AdcReader::Result::RESULT_OK) {
-						printf("Battery level measured: %u mV\n", battery_level);
+						
+						battery = static_cast<uint8_t>((get_battery_level - BATTERY_LOW_THRESHOLD) * 100 / (BATTERY_HIGH_THRESHOLD - BATTERY_LOW_THRESHOLD));
+						if (battery > 100) battery = 100; // Cap at 100%
+						printf("Battery level measured: %u mV percent %u%%\n", get_battery_level, battery);
 					} else {
 						printf("Battery measurement not available, result code: %d\n", static_cast<int>(result));
 					}
 				} else {
 					printf("ADC reader not initialized\n");
 				}	
-				std::vector<uint8_t> battery_payload(sizeof(battery_level));
-				std::memcpy(battery_payload.data(), &battery_level, sizeof(battery_level));
+				std::vector<uint8_t> battery_payload(sizeof(battery));
+				std::memcpy(battery_payload.data(), &battery, sizeof(battery));
 				DataTransmit::GetInstance().SendData(Packet::Battery_response, battery_payload);
 			}
 			else{
