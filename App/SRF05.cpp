@@ -266,7 +266,9 @@ unsigned long SRF05::pulseIn(unsigned long timeout)
 
 	// wait for any previous pulse to end
    while(HAL_GPIO_ReadPin(_echo_port,_echo_pin) !=GPIO_PIN_RESET)
-	   if (GetMillis()>=MaxTime ) return 0;
+	   if (GetMillis()>=MaxTime ) {
+     return 0;
+     }
 
    StartCapture();
 

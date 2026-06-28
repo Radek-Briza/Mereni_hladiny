@@ -229,11 +229,7 @@ void App::loop()
 				printf("Received Level Request\n");
 				led_controller.SetMode(LedController::Leds::Green, LedController::LedMode::OneShot);
 				
-				/* start battery measurement */
-				if (adc_reader_ && !adc_reader_->Start()) {
-					printf("ADC start failed\n");
-				}
-
+				
 				/* start distance measurement */
 				GetDistance = static_cast<uint16_t>(EchoDriver.getCentimeter()); 
 				printf("Measured distance: %u cm\n", GetDistance);
@@ -259,11 +255,17 @@ void App::loop()
 				DataTransmit::GetInstance().SendData(Packet::Level_response, payload);
 			}
 			else if(DataTransmit::GetInstance().GetReceivedDataType() == Packet::Battery_request){
-				printf("Received Battery Request\n");
+
 				
+
 				/* start battery measurement */
 				uint16_t get_battery_level = 0;
 				uint8_t battery = 0; // Variable to hold battery level percentage
+				printf("Received Battery Request\n");
+				/* start battery measurement */
+				if (adc_reader_ && !adc_reader_->Start()) {
+					printf("ADC start failed\n");
+				}
 				
 				if (adc_reader_) {
 					adc_reader_->Process(); // Ensure ADC processing is done before reading
