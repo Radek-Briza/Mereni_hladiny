@@ -191,6 +191,7 @@ void App::init()
 		  static_cast<int>(Param["H_level"]));
 		CalibrationError = false;
 	}
+	EchoDriver.setModeMedian(10);
 
 	DataTransmit::GetInstance().Init(&Radio, false); // Initialize DataTransmit in Master mode
 	printf("Init device\r");
