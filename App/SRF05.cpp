@@ -136,7 +136,7 @@ uint32_t SRF05::getMillimeter(){
 
 float SRF05::getCentimeter(){
   HAL_GPIO_WritePin(SENSOR_PWR_EN_GPIO_Port, SENSOR_PWR_EN_Pin, GPIO_PIN_SET);
-  HAL_Delay(10); // Allow sensor to power up
+  HAL_Delay(5); // Allow sensor to power up
   float distance = _speedOfSound * getTime() * 0.5e-4;
   HAL_GPIO_WritePin(SENSOR_PWR_EN_GPIO_Port, SENSOR_PWR_EN_Pin, GPIO_PIN_RESET);
   return distance;

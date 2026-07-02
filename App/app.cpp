@@ -239,7 +239,10 @@ void App::loop()
 				if(Param["L_level"]==0){
 					 GetLevel = 0;
 					}else {
-						GetLevel = Param["L_level"] - GetDistance;
+						if(GetDistance < Param["H_level"] ) GetLevel = Param["H_level"];
+						else {
+							GetLevel = Param["L_level"] - GetDistance;
+						}
 					}
 						
 
