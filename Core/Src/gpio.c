@@ -75,11 +75,17 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(ECHO_GPIO_Port, &GPIO_InitStruct);
 
-/*Configure GPIO pins : BT_1_Pin BT_2_Pin */
-  GPIO_InitStruct.Pin = BT_1_Pin|BT_2_Pin;
+  /*Configure GPIO pin : BT_1_Pin */
+  GPIO_InitStruct.Pin = BT_1_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(BT_1_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : BT_2_Pin */
+  GPIO_InitStruct.Pin = BT_2_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+  HAL_GPIO_Init(BT_2_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : SENSOR_PWR_EN_Pin */
   GPIO_InitStruct.Pin = SENSOR_PWR_EN_Pin;
@@ -93,6 +99,10 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(BT_3_GPIO_Port, &GPIO_InitStruct);
+
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI0_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI0_IRQn);
 
 }
 

@@ -26,9 +26,9 @@
 constexpr uint32_t LEVEL_L = (1u << 0);
 constexpr uint32_t LEVEL_UNDER_M = (1u << 1);
 constexpr uint32_t LEVEL_H = (1u << 2);
-constexpr uint32_t LEVEL_L_CM =	10;
-constexpr uint32_t LEVEL_M_CM =	30;
-constexpr uint32_t LEVEL_H_CM =	100;
+constexpr uint32_t LEVEL_L_CM =	85;
+constexpr uint32_t LEVEL_M_CM =	40;
+constexpr uint32_t LEVEL_H_CM =	5;
 constexpr uint16_t BATTERY_LOW_THRESHOLD = 3000; // 3.0V
 constexpr uint16_t BATTERY_HIGH_THRESHOLD = 4200; // 4.2V
 
@@ -110,6 +110,7 @@ bool App::CalibrationRoutime (ButtonAssignment button){
 					if(Mode == CalibrationMode::MODE_CALIBRATION_M)  M_value = GetDistance;
 					if(Mode == CalibrationMode::MODE_CALIBRATION_H)  H_value = GetDistance;
 					led_controller.SetMode(LedController::Leds::Red,LedController::LedMode::OneShot);
+					printf("Calibration value stored: L=%u M=%u H=%u\n", L_value, M_value, H_value);
 					return true;
 				}
 
@@ -182,8 +183,11 @@ void App::init()
 	AdcReader::AttachIrqHandler(&*adc_reader_);
 	
 	if(!param_storage.ReadRecord(Param)){
-		led_controller.SetMode(LedController::Leds::Red, LedController::LedMode::Blink);
+		//led_controller.SetMode(LedController::Leds::Red, LedController::LedMode::Blink);
 		printf("Calibration error\n");	
+		Param["L_level"] = LEVEL_L_CM;
+		Param["M_level"] = LEVEL_M_CM;	
+		Param["H_level"] = LEVEL_H_CM;
 	}
 	else{
 		printf("Calibration loaded from flash: L_level=%d M_level=%d H_level=%d\n", static_cast<int>(Param["L_level"]),
@@ -212,8 +216,7 @@ void App::loop()
 			CalibrationRun = CalibrationRoutime(button);
 			}
 		}
-		
-
+	
 		/*calibration messure run */
 		if(CalibrationRun== true){
 			if(HAL_GetTick() >  CalibrationTimeStamp+CALIBRATION_RUN_PERIODE){ 
@@ -224,7 +227,7 @@ void App::loop()
 		}
 
 		/* Kontrola přijatých dat */
-		if(DataTransmit::DataAvailable){
+		if(DataTransmit::DataAvailable && !CalibrationRun){
 			DataTransmit::DataAvailable = false; // Reset flag for next reception
 			if(DataTransmit::GetInstance().GetReceivedDataType() == Packet::Level_request && CalibrationRun==false){
 				printf("Received Level Request\n");
@@ -239,13 +242,12 @@ void App::loop()
 				if(Param["L_level"]==0){
 					 GetLevel = 0;
 					}else {
-						if(GetDistance < Param["H_level"] ) GetLevel = Param["H_level"];
+						if(GetDistance <= Param["H_level"] ) GetLevel = Param["L_level"];// max level
 						else {
 							GetLevel = Param["L_level"] - GetDistance;
 						}
 					}
 						
-
 				if(GetDistance >= Param["L_level"] ) status  |=LEVEL_L ;
 				if(GetDistance > Param["M_level"]  && GetDistance <  Param["L_level"]) status   |=LEVEL_UNDER_M ;
 				if(GetDistance <= Param["H_level"] ) status  |=LEVEL_H ;
@@ -259,9 +261,6 @@ void App::loop()
 				DataTransmit::GetInstance().SendData(Packet::Level_response, payload);
 			}
 			else if(DataTransmit::GetInstance().GetReceivedDataType() == Packet::Battery_request){
-
-				
-
 				/* start battery measurement */
 				uint16_t get_battery_level = 0;
 				uint8_t battery = 0; // Variable to hold battery level percentage
@@ -300,7 +299,7 @@ void App::loop()
 		HAL_IWDG_Refresh(&hiwdg);
 		#endif
 		#if SLEEP_ENABLE
-		if(CalibrationRun==false ){
+		if(CalibrationRun==false && button_monitor.GetLastEvent(static_cast<uint8_t>(button))== ButtonEvent::NONE) {
 			Sleep(0);
 		}
 		#endif
@@ -354,6 +353,7 @@ void App::Sleep(uint32_t durationMs)
         // Enter STOP mode - CPU halts here
         UTIL_LPM_EnterLowPower();
 
+		 SystemClock_Config(); // Reconfigure system clock after wakeup
         // Execution resumes here after RTC wakeup
         printf("Exiting STOP mode.\n");
 

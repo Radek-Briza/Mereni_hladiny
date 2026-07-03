@@ -223,7 +223,7 @@ void EXTI0_IRQHandler(void)
   /* USER CODE END EXTI0_IRQn 0 */
   BSP_PB_IRQHandler(BUTTON_SW1);
   /* USER CODE BEGIN EXTI0_IRQn 1 */
-
+printf("EXTI0_IRQHandler called\r\n");
   /* USER CODE END EXTI0_IRQn 1 */
 }
 

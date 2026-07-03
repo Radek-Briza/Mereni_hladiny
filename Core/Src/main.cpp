@@ -127,7 +127,8 @@ int main(void)
   {
     Error_Handler();
   }
-
+  
+  printf("-----------------------------r\n");
   printf("\rMereni hladiny ver 1.03 \r\n") ;
   /* Infinite loop */
   App Application;
