@@ -9,6 +9,7 @@
 #include "crc.h"
 #include "stm32wlxx_hal_crc.h"
 #include "stm32wlxx_hal_crc_ex.h"
+#include "Common.h"
 
 Packet::Packet() = default;
 Packet::~Packet() = default;
@@ -36,12 +37,13 @@ uint16_t calculate_crc(std::span<uint8_t> data,uint16_t initial_value = 0xFFFFu)
     if (HAL_CRC_Init(&modbus_crc) != HAL_OK) {
         return initial_value;
     }
-
+    #if PROTOCOL_DEBUG
     printf("Calculatin CRC, initial value: 0x%04X for data: ", initial_value);
     for (auto const &byte : data) {
         printf("%02X ", byte);
     }
     printf("\n");
+    #endif
     uint16_t crc = HAL_CRC_Calculate(&modbus_crc,
                                      reinterpret_cast<uint32_t*>(data.data()),
                                      static_cast<uint32_t>(data.size()));
@@ -75,11 +77,15 @@ bool Packet::CreatePacket(PacketType Type ){
    auto Header = std::span{PacketData}.first(Packet::header_size-Packet::crc_size); // - crc area
    uint16_t crc = calculate_crc(Header); // Calculate CRC over header and payload
    crc = calculate_crc(Payload, crc); // Calculate CRC over header and payload
+   #if PROTOCOL_DEBUG
    printf("Calculated CRC: 0x%04X\n", crc); // Print calculated CRC for debugging
+   #endif
    std::ranges::copy(GetAsByteArray(crc), CRC_data.begin());
    std::ranges::copy_n(PacketData.data(), Packet::header_size, std::back_inserter(Packet_output)); // Copy header to output vector
   
+    #if PROTOCOL_DEBUG
     printf("packet size: %d\n", static_cast<unsigned int>(Packet_output.size()));
+    #endif
    return true; // Packet created successfully
 }
 
@@ -105,7 +111,9 @@ bool Packet::CreatePacket(PacketType Type ){
    std::span Payload_span = std::span{PacketData}.subspan(Packet::header_size, payload_size); // Span for actual payload data
    crc = calculate_crc(Payload_span, crc); // Calculate CRC over header and payload
   // crc = calculate_crc(Payload, crc); // Calculate CRC over header and payload
+   #if PROTOCOL_DEBUG
    printf("Calculated CRC: 0x%04X\n", crc); // Print calculated CRC for debugging
+   #endif
    std::ranges::copy(GetAsByteArray(crc), CRC_data.begin());
    std::ranges::copy_n(PacketData.data(), Packet::header_size+Payload_input.size(), std::back_inserter(Packet_output)); // Copy header to output vector
    return true; // Packet created successfully
@@ -132,6 +140,7 @@ bool Packet::CreatePacket(PacketType Type ){
     printf("Data length exceeds maximum payload size: %u\n", m_data_length);
     return false; // Data length exceeds maximum payload size
  }
+ #if PROTOCOL_DEBUG
  printf("Packet ID: %u\n", m_paket_ID);
  printf("Data Length: %u\n", m_data_length);       
  printf("Payload: ");
@@ -141,6 +150,7 @@ bool Packet::CreatePacket(PacketType Type ){
      }
      printf("\n");
     }
+ #endif
 
  // verify CRC
  auto Header = std::span{Packet_inp}.first(Packet::header_size-Packet::crc_size); // - crc area
@@ -150,7 +160,9 @@ bool Packet::CreatePacket(PacketType Type ){
             printf("CRC check failed! Expected: 0x%04X, Calculated: 0x%04X\n", static_cast<unsigned int >(m_crc_data), static_cast<unsigned int>(calculated_crc));
             return false; // CRC check failed
         }
+        #if PROTOCOL_DEBUG
         printf("CRC check passed!\n");
+        #endif
         std::ranges::copy(Payload.first(m_data_length), Payload_output.begin()); // Copy payload to output vector
         Type_out = static_cast<PacketType>(m_paket_ID); // Assuming the first byte of the payload indicates the packet type 
 return true; // Packet parsed successfully

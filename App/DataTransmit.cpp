@@ -11,11 +11,15 @@
 #include <cassert>
 #include <cstring>
 #include <cstdio>
+#include "Common.h"
+
+
 
 bool DataTransmit::MasterMode = false;
 bool DataTransmit::RequestSent = false;
 bool DataTransmit::DataAvailable = false;
 bool DataTransmit::DataOverload = false;
+bool DataTransmit::RadioRun = false;
 const struct Radio_s* DataTransmit::RadioDriver = nullptr;
 RadioEvents_t DataTransmit::RadioEvents = {};
 TimerEvent_t DataTransmit::CadTimer = {};
@@ -33,6 +37,7 @@ void RadioCadTimeoutIrq( void *context ){
 	}
 	DataTransmit::RadioDriver->Standby( );
 	DataTransmit::RadioDriver->SetChannel(CHANNEL);
+	if(DataTransmit::RadioRun == false) return;
 	DataTransmit::RadioDriver->StartCad( );
 	printf("Start CAD\n");
 }
@@ -45,7 +50,9 @@ extern "C" void OnCadDone( bool channelActivityDetected ){
 		printf(">>>>Start RX\n");
 	}else{
 		// Channel is clear, proceed with transmission
-		TimerStart(&DataTransmit::CadTimer );
+		if(DataTransmit::RadioRun == true){
+			TimerStart(&DataTransmit::CadTimer );
+		}
 	}
 }
 
@@ -57,12 +64,16 @@ void OnTxDone(void){
 	DataTransmit::RadioDriver->Standby( );
 	DataTransmit::RadioDriver->SetChannel(CHANNEL);
 	DataTransmit::RadioDriver->StartCad( );
+	#if RADIO_DEBUG
 	printf("Transmission done, restarting CAD\n");
+	#endif
 };
 
 /* Callback functions - Rx complete */
 extern "C" void OnRxDone(uint8_t *payload, uint16_t size, int16_t rssi, int8_t LoraSnr_FskCfo){
+	#if RADIO_DEBUG
 	printf("Received packet: size=%u, rssi=%d, snr=%d\n", size, rssi, LoraSnr_FskCfo);
+	#endif	
 	// kopírujeme payload do packetu pro další zpracování
 	std::array<uint8_t, Packet::max_packet_size> buffer{};
 	std::memcpy(buffer.data(), payload, size);
@@ -86,7 +97,9 @@ extern "C" void OnTxTimeout(void){
 	DataTransmit::RadioDriver->Standby( );
 	DataTransmit::RadioDriver->SetChannel(CHANNEL);
 	DataTransmit::RadioDriver->StartCad( );
+	#if RADIO_DEBUG
 	printf("TX Timeout, restarting CAD\n");
+	#endif
 }
 
 extern "C" void OnRxTimeout(void){
@@ -100,7 +113,9 @@ extern "C" void OnRxTimeout(void){
 	DataTransmit::RadioDriver->Standby( );
 	DataTransmit::RadioDriver->SetChannel(CHANNEL);
 	DataTransmit::RadioDriver->StartCad( );
+	#if RADIO_DEBUG
 	printf("RX Timeout, restarting CAD\n");
+	#endif
 }
 
 extern "C" void OnRxError(void){
@@ -114,7 +129,9 @@ extern "C" void OnRxError(void){
 	DataTransmit::RadioDriver->Standby( );
 	DataTransmit::RadioDriver->SetChannel(CHANNEL);
 	DataTransmit::RadioDriver->StartCad( );
+	#if RADIO_DEBUG
 	printf("RX Error, restarting CAD\n");
+	#endif
 }
 
 /* init  radio */
@@ -147,11 +164,27 @@ void DataTransmit::Init(const struct Radio_s *Radio_,bool MasterMode_){
 	if(MasterMode == false){
 		TimerInit( &CadTimer,RadioCadTimeoutIrq );
 		TimerSetValue( &CadTimer,CAD_sample );
-		TimerStart( &CadTimer );	
 	}
 	DataAvailable = false;		
 	DataOverload = false;		
 	printf("DataTransmit initialized\n");
+}
+
+/* On/Off radio */
+bool DataTransmit::RadioTransmitOnOff(bool On){
+	if(On == true && MasterMode == false && RadioRun == false){
+		TimerStart( &CadTimer );
+		RadioRun = true;
+		printf("Radio started\n");
+		return true;
+	}
+	if(On == false && RadioRun == true) {
+		TimerStop( &CadTimer );
+		RadioRun = false;
+		printf("Radio stopped\n");
+		return true;
+	}
+	return false;
 }
 
 /* odeslat požadavek na data */
@@ -159,15 +192,19 @@ bool DataTransmit::SendRquest(Packet::PacketType Type){
 	
 	/* create packet */
 	if(!packet.CreatePacket(Type)){
+		#if RADIO_DEBUG
 		printf("Packet creation failed!\n");
+		#endif
 		return false; // Packet creation failed
 	}
 	/* send packet */
+	#if RADIO_DEBUG
 	printf("Raw data sent: ");
 	for(size_t i = 0; i < packet.Packet_output.size(); ++i){
 		printf("%02X ", packet.Packet_output[i]);
 	}
 	printf("\n");
+	#endif
 	
 	RequestSent = true;
 	SlaveNotResponding = false;
@@ -197,16 +234,20 @@ bool DataTransmit::SendData(Packet::PacketType Type,std::vector<uint8_t>& data){
 	}
 	
 	/* send packet */
+	#if RADIO_DEBUG
 	printf("Raw data sent: ");
 	for(size_t i = 0; i < packet.Packet_output.size(); ++i){
 		printf("%02X ", packet.Packet_output[i]);
 	}
 	printf("\n");
+	#endif
 
 	TimerStop( &CadTimer );	
 	RadioDriver->Standby( );
 	RadioDriver->SetChannel(CHANNEL);
 	RadioDriver->Send(packet.Packet_output.data(), packet.Packet_output.size());
-
+	#if RADIO_DEBUG == 0
+	printf("Data sent\n");
+	#endif
 	return true;
 }

@@ -10,13 +10,14 @@
 
 #include <map>
 #include <string>
+#include <array>
 
 #include "main.h"
 #include "ButtonControl.hpp"
 #include "AdcReader.hpp"
 #include "LedController.hpp"
 #include "FlashStorage.hpp"
-
+#include "timer.h"
 #include <optional>
 
 
@@ -91,6 +92,18 @@ public:
     void loop();
 
     /**
+     * @brief Set number of samples used for median filtering.
+     *
+     * @param sampleCount Requested number of samples.
+     */
+    void SetPeriodicSampleCount(uint16_t sampleCount);
+
+    /**
+     * @brief Clear buffered measurement samples and restart filtering.
+     */
+    void ClearPeriodicSamples();
+
+    /**
      * @brief Sleep the processor with minimal power consumption.
      *
      * Configures an RTC alarm for the specified duration and enters STOP mode.
@@ -110,7 +123,11 @@ private:
     /**
      * @brief Calibration polling interval in milliseconds.
      */
-    static constexpr uint32_t CALIBRATION_RUN_PERIODE = 100U; // ms
+    //static constexpr uint32_t CALIBRATION_RUN_PERIODE = 100U; // ms
+
+    static constexpr uint32_t MEASURE_INTERVAL = 1000u; // ms
+    static constexpr uint16_t DEFAULT_SAMPLE_COUNT = 10u;
+    static constexpr uint16_t MAX_SAMPLE_COUNT = 32u;
 
     /**
      * @brief Last measured level in centimeters.
@@ -118,9 +135,27 @@ private:
     uint16_t GetLevel;
 
     /**
+     * @brief Final level value 
+     * 
+     */
+    uint16_t FinalLevelValue=0u;
+
+    /**
      * @brief Last measured distance in centimeters from top barrel .
      */
     uint16_t GetDistance = 0; /**< Last measured distance in centimeters. */
+
+    /**
+     * @brief 
+     * 
+     */
+     bool FinalDataReady = false;  
+
+    /**
+     * @brief  Run calibration mode flag
+     * 
+     */
+     bool CalibrationRun=false;
 
     /**
      * @brief Indicates whether calibration data is invalid or missing.
@@ -143,6 +178,20 @@ private:
      */
     FlashParameterStorage param_storage{0x0803F800};
 
+    /**
+     * @brief Periodic measure  timer handlet 
+     * 
+     */
+     TimerEvent_t MeasureTimer;
+
+    std::array<uint16_t, MAX_SAMPLE_COUNT> DistanceSamples{};
+    uint16_t DistanceSampleCount = DEFAULT_SAMPLE_COUNT;
+    uint16_t DistanceSamplesUsed = 0u;
+
+    /**
+     * @brief 
+     * 
+     */
     /**
      * @brief Current calibration thresholds.
      *
@@ -167,5 +216,8 @@ private:
      * @return false if calibration mode is inactive or was ended.
      */
     bool CalibrationRoutime(ButtonAssignment button);
+
+     /* */
+    void PeriodicMeasure(void);
 
 };

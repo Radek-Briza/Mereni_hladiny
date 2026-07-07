@@ -12,6 +12,7 @@
 #include "Board_hw_specific.h"
 #include "radio.h"	
 #include <cstdint>
+#include <algorithm>
 #include <array>
 #include <span>
 #include <stm32wlxx_hal_uart.h>
@@ -31,14 +32,108 @@ constexpr uint32_t LEVEL_M_CM =	40;
 constexpr uint32_t LEVEL_H_CM =	5;
 constexpr uint16_t BATTERY_LOW_THRESHOLD = 3000; // 3.0V
 constexpr uint16_t BATTERY_HIGH_THRESHOLD = 4200; // 4.2V
-
 extern IWDG_HandleTypeDef hiwdg;
 
+
 SRF05 EchoDriver(SRF05_PORT[TRIGER],SRF05_PIN[TRIGER],SRF05_PORT[ECHO],SRF05_PIN[ECHO]);
+
+namespace {
+volatile bool MeasureReq = false;
+}
 
 extern "C" void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)
 {
 	AdcReader::HandleInterrupt(hadc);
+}
+
+extern "C" [[maybe_unused]] void MeasureReqCallback(void *context)
+{
+	(void)context;
+	MeasureReq = true;
+}
+
+
+/* periodic  messurre */
+void  App::PeriodicMeasure(void) {
+	const uint16_t distance = static_cast<uint16_t>(EchoDriver.getCentimeter());
+	printf("RAW distance: %u cm\n", distance);
+
+	if (DistanceSampleCount == 0u) {
+		DistanceSampleCount = DEFAULT_SAMPLE_COUNT;
+	}
+
+	if (DistanceSamplesUsed < DistanceSampleCount) {
+		DistanceSamples[DistanceSamplesUsed] = distance;
+		++DistanceSamplesUsed;
+	} else {
+		for (uint16_t i = 1u; i < DistanceSampleCount; ++i) {
+			DistanceSamples[i - 1u] = DistanceSamples[i];
+		}
+		DistanceSamples[DistanceSampleCount - 1u] = distance;
+	}
+
+	if (DistanceSamplesUsed < DistanceSampleCount) {
+		FinalDataReady = false;
+		printf("Measured distance sample: %u cm (%u/%u)\n", distance,
+			DistanceSamplesUsed, DistanceSampleCount);
+		return;
+	}
+
+	std::array<uint16_t, MAX_SAMPLE_COUNT> sorted = DistanceSamples;
+	std::sort(sorted.begin(), sorted.begin() + DistanceSampleCount);
+
+	const uint16_t mid = DistanceSampleCount / 2u;
+	uint16_t median = sorted[mid];
+	if ((DistanceSampleCount % 2u) == 0u) {
+		median = static_cast<uint16_t>((static_cast<uint32_t>(sorted[mid - 1u]) +
+			static_cast<uint32_t>(sorted[mid])) / 2u);
+	}
+
+	GetDistance = median;
+
+	const int32_t lLevel = Param["L_level"];
+	if (lLevel <= 0) {
+		FinalLevelValue = 0u;
+	} else if (GetDistance >= static_cast<uint16_t>(lLevel)) {
+		FinalLevelValue = static_cast<uint16_t>(lLevel);
+	} else {
+		FinalLevelValue = static_cast<uint16_t>(static_cast<uint16_t>(lLevel) - GetDistance);
+	}
+
+	GetLevel = FinalLevelValue;
+	if(FinalDataReady == false){
+		FinalDataReady = true;
+		if(CalibrationRun == false){
+			 DataTransmit::GetInstance().RadioTransmitOnOff(true);
+			}else{
+				led_controller.SetMode(LedController::Leds::Red,LedController::LedMode::Off);
+			} 
+	}
+	printf("Median distance: %u cm, level: %u cm\n", GetDistance, FinalLevelValue);
+
+}
+
+void App::SetPeriodicSampleCount(uint16_t sampleCount)
+{
+	if (sampleCount == 0u) {
+		DistanceSampleCount = DEFAULT_SAMPLE_COUNT;
+	} else if (sampleCount > MAX_SAMPLE_COUNT) {
+		DistanceSampleCount = MAX_SAMPLE_COUNT;
+	} else {
+		DistanceSampleCount = sampleCount;
+	}
+
+	ClearPeriodicSamples();
+}
+
+void App::ClearPeriodicSamples()
+{
+	DistanceSamples.fill(0u);
+	DistanceSamplesUsed = 0u;
+	GetDistance = 0u;
+	FinalLevelValue = 0u;
+	GetLevel = 0u;
+	FinalDataReady = false;
 }
 
 
@@ -80,8 +175,9 @@ bool App::CalibrationRoutime (ButtonAssignment button){
 			if(Event == ButtonEvent::HELD){
 				Mode = CalibrationMode::MODE_CALIBRATION_L;
 				led_controller.SetMode(LedController::Leds::Green, LedController::LedMode::On);
-				led_controller.SetMode(LedController::Leds::Red,LedController::LedMode::Off);
-				CalibrationError = true;
+				led_controller.SetMode(LedController::Leds::Red,LedController::LedMode::On);
+				ClearPeriodicSamples();
+				DataTransmit::GetInstance().RadioTransmitOnOff(false);
 				printf("Calibration mode started\n");
 				return true;
 			}
@@ -97,6 +193,7 @@ bool App::CalibrationRoutime (ButtonAssignment button){
 					led_controller.SetMode(LedController::Leds::Green, LedController::LedMode::Off);
 					led_controller.SetMode(LedController::Leds::Blue,LedController::LedMode::Off);
 					led_controller.SetMode(LedController::Leds::Red,LedController::LedMode::Off);
+					DataTransmit::GetInstance().RadioTransmitOnOff(true);
 					printf("Calibration mode exited\n");
 					return false;
 				}
@@ -104,13 +201,15 @@ bool App::CalibrationRoutime (ButtonAssignment button){
 			/* store param */
 			if(Mode != CalibrationMode::MODE_NONE 
 				&& 	button == ButtonAssignment::BUTTON_STORE
-				&&  Event == ButtonEvent::PRESSED)
+				&&  Event == ButtonEvent::PRESSED
+				&& FinalDataReady == true)
 				{
 					if(Mode == CalibrationMode::MODE_CALIBRATION_L)  L_value = GetDistance;
 					if(Mode == CalibrationMode::MODE_CALIBRATION_M)  M_value = GetDistance;
 					if(Mode == CalibrationMode::MODE_CALIBRATION_H)  H_value = GetDistance;
 					led_controller.SetMode(LedController::Leds::Red,LedController::LedMode::OneShot);
-					printf("Calibration value stored: L=%u M=%u H=%u\n", L_value, M_value, H_value);
+					printf("Calibration value stored: L=%u M=%u H=%u\n", static_cast<unsigned int>(L_value),
+					 static_cast<unsigned int>(M_value), static_cast<unsigned int>(H_value));
 					return true;
 				}
 
@@ -118,14 +217,14 @@ bool App::CalibrationRoutime (ButtonAssignment button){
 			if(Mode != CalibrationMode::MODE_NONE 
 				&& button == ButtonAssignment::BUTTON_VALUE_STORE
 				&& Event == ButtonEvent::HELD){
-				if(L_value != 0 )	CalibParams["L_level"] = L_value;
-				if(M_value != 0 )	CalibParams["M_level"] = M_value;
-				if(H_value != 0 )	CalibParams["H_level"] = H_value;
+				if(L_value != 0 )	CalibParams["L_level"] = static_cast<unsigned int>(L_value);
+				if(M_value != 0 )	CalibParams["M_level"] = static_cast<unsigned int>(M_value);
+				if(H_value != 0 )	CalibParams["H_level"] = static_cast<unsigned int>(H_value);
 
 				/*update work params*/
-				Param["L_level"] = L_value;
-				Param["M_level"] = M_value;
-				Param["H_level"] = H_value;
+				Param["L_level"] = static_cast<unsigned int>(L_value);
+				Param["M_level"] = static_cast<unsigned int>(M_value);
+				Param["H_level"] = static_cast<unsigned int>(H_value);
 
 				Mode = CalibrationMode::MODE_NONE; 
 
@@ -137,6 +236,7 @@ bool App::CalibrationRoutime (ButtonAssignment button){
 				} else {
 						printf("Failed to save calibration values to flash.\n");
 						}
+				DataTransmit::GetInstance().RadioTransmitOnOff(true);
 				return false;
 			}	
 
@@ -166,9 +266,9 @@ bool App::CalibrationRoutime (ButtonAssignment button){
 					return true;
 				}
 			}
-		return false;		
+	
 	} 
-	return false;
+	return true;
 }
 
 /*init app */
@@ -195,36 +295,46 @@ void App::init()
 		  static_cast<int>(Param["H_level"]));
 		CalibrationError = false;
 	}
-	EchoDriver.setModeMedian(10);
+	EchoDriver.setModeMedian(3);
 
 	DataTransmit::GetInstance().Init(&Radio, false); // Initialize DataTransmit in Master mode
+	UTIL_TIMER_Create(&MeasureTimer, MEASURE_INTERVAL, UTIL_TIMER_PERIODIC,  MeasureReqCallback, NULL);
+	TimerStart( &MeasureTimer );
 	printf("Init device\r");
 }
 
 /* main app loop */
-void App::loop()
-{
-	bool CalibrationRun=false;
-	uint32_t CalibrationTimeStamp=0U;
-
+void App::loop(){
+		bool PrevCalibrationRun=false;
 	for(;;){
 
 		/* Kontrola stisknutých tlačítek */
+		
 		auto button = static_cast<ButtonAssignment>(button_monitor.ScanButton());
 		if(button != ButtonAssignment::NO_BUTTON) {
+			printf("Button event: %d\n", static_cast<int>(button));
 			if(button_monitor.GetLastEvent(static_cast<uint8_t>(button))!= ButtonEvent::RELEASED){
 			CalibrationRun = CalibrationRoutime(button);
 			}
 		}
-	
-		/*calibration messure run */
-		if(CalibrationRun== true){
-			if(HAL_GetTick() >  CalibrationTimeStamp+CALIBRATION_RUN_PERIODE){ 
-				 CalibrationTimeStamp = HAL_GetTick();
-				 GetDistance = static_cast<uint16_t>(EchoDriver.getCentimeter());
-				 printf("Calibration mode, measured level: %u cm\n", GetDistance);
-			}
+		
+
+		if (CalibrationRun != PrevCalibrationRun) {
+			ClearPeriodicSamples();
+			PrevCalibrationRun = CalibrationRun;
 		}
+	
+		
+		/* measure  */
+		if(MeasureReq == true 
+			&& HAL_GPIO_ReadPin(BT_1_GPIO_Port, BT_1_Pin) == GPIO_PIN_SET
+			&& HAL_GPIO_ReadPin(BT_2_GPIO_Port, BT_2_Pin) == GPIO_PIN_SET
+			&& HAL_GPIO_ReadPin(BT_3_GPIO_Port, BT_3_Pin) == GPIO_PIN_SET) {
+			MeasureReq = false;
+			PeriodicMeasure();
+		}
+
+	
 
 		/* Kontrola přijatých dat */
 		if(DataTransmit::DataAvailable && !CalibrationRun){
@@ -232,25 +342,10 @@ void App::loop()
 			if(DataTransmit::GetInstance().GetReceivedDataType() == Packet::Level_request && CalibrationRun==false){
 				printf("Received Level Request\n");
 				led_controller.SetMode(LedController::Leds::Green, LedController::LedMode::OneShot);
-				
-				
-				/* start distance measurement */
-				GetDistance = static_cast<uint16_t>(EchoDriver.getCentimeter()); 
-				printf("Measured distance: %u cm\n", GetDistance);
-				uint16_t status = 0;
-
-				if(Param["L_level"]==0){
-					 GetLevel = 0;
-					}else {
-						if(GetDistance <= Param["H_level"] ) GetLevel = Param["L_level"];// max level
-						else {
-							GetLevel = Param["L_level"] - GetDistance;
-						}
-					}
-						
-				if(GetDistance >= Param["L_level"] ) status  |=LEVEL_L ;
-				if(GetDistance > Param["M_level"]  && GetDistance <  Param["L_level"]) status   |=LEVEL_UNDER_M ;
-				if(GetDistance <= Param["H_level"] ) status  |=LEVEL_H ;
+				uint16_t  status = 0;
+				if(FinalLevelValue >= Param["L_level"] ) status  |=LEVEL_L ;
+				if(FinalLevelValue > Param["M_level"]  && FinalLevelValue <  Param["L_level"]) status   |=LEVEL_UNDER_M ;
+				if(FinalLevelValue <= Param["H_level"] ) status  |=LEVEL_H ;
 				printf("Measured level: %u cm status :%u\n", GetLevel, status );
 
 				std::vector<uint8_t> payload(sizeof(GetLevel) + sizeof(status));
@@ -294,15 +389,21 @@ void App::loop()
 		}
 
 		/* led control */
+		
 		led_controller.Run();
 		#if WDT_ENABLE
 		HAL_IWDG_Refresh(&hiwdg);
 		#endif
+
+		/* sleep  - only if calibration is not running and no button is pressed */
 		#if SLEEP_ENABLE
-		if(CalibrationRun==false && button_monitor.GetLastEvent(static_cast<uint8_t>(button))== ButtonEvent::NONE) {
+		if(CalibrationRun==false 
+			&& button_monitor.GetLastEvent(static_cast<uint8_t>(button))== ButtonEvent::NONE
+		    && HAL_GPIO_ReadPin(BT_1_GPIO_Port, BT_1_Pin) == GPIO_PIN_SET) {
 			Sleep(0);
 		}
 		#endif
+	
 	}
 
 }
@@ -324,7 +425,7 @@ void App::Sleep(uint32_t durationMs)
 
     if (durationMs == 0) {
         // Force STOP mode by allowing Stop mode and disallowing OFF mode
-		printf("Sleep: Entering STOP mode indefinitely (waiting for interrupt)...\n");
+		printf("Sleep:\n");
         UTIL_LPM_SetStopMode(1, UTIL_LPM_ENABLE);
         UTIL_LPM_SetOffMode(1, UTIL_LPM_DISABLE);
        // Enter STOP mode - CPU halts here

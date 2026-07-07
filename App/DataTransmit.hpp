@@ -37,6 +37,7 @@ public:
 	bool SendRquest(Packet::PacketType Type);
 	bool SendData(Packet::PacketType Type,std::vector<uint8_t>& data);
 	Packet::PacketType GetReceivedDataType() const { return DataType; }
+	bool RadioTransmitOnOff(bool On);
 	static bool DataAvailable;
 	static bool DataOverload; 
 	static bool RequestSent;
@@ -61,6 +62,7 @@ private:
 	static RadioEvents_t RadioEvents;
 	static TimerEvent_t CadTimer;
 	static Packet packet;
+	static bool RadioRun;
 	//static std::vector<uint8_t> Data; // Buffer pro příjem dat z rádia
     static Packet::PacketType DataType; // Proměnná pro uložení typu dat z příchozího packetu
 

@@ -128,8 +128,8 @@ int main(void)
     Error_Handler();
   }
   
-  printf("-----------------------------r\n");
-  printf("\rMereni hladiny ver 1.03 \r\n") ;
+  printf("-----------------------------\r\n");
+  printf("\rMereni hladiny ver 1.05 \r\n") ;
   /* Infinite loop */
   App Application;
   Application.init();
