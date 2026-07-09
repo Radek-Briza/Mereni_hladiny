@@ -103,7 +103,7 @@ void  App::PeriodicMeasure(void) {
 	if (lLevel <= 0) {
 		FinalLevelValue = 0u;
 	} else if (DistanceCorrected >= static_cast<uint16_t>(lLevel)) {
-		FinalLevelValue = static_cast<uint16_t>(lLevel);
+		FinalLevelValue = 0;
 	} else {
 		FinalLevelValue = static_cast<uint16_t>(static_cast<uint16_t>(lLevel) - DistanceCorrected);
 	}
