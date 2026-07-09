@@ -23,6 +23,7 @@
 #include "stm32_lpm_if.h"
 #include "stm32_timer.h"
 #include "timer_if.h"
+#include "common.h"
 
 constexpr uint32_t LEVEL_L = (1u << 0);
 constexpr uint32_t LEVEL_UNDER_M = (1u << 1);
@@ -55,6 +56,7 @@ extern "C" [[maybe_unused]] void MeasureReqCallback(void *context)
 
 /* periodic  messurre */
 void  App::PeriodicMeasure(void) {
+	printf("Periodic measure start\n");
 	const uint16_t distance = static_cast<uint16_t>(EchoDriver.getCentimeter());
 	printf("RAW distance: %u cm\n", distance);
 
@@ -90,14 +92,20 @@ void  App::PeriodicMeasure(void) {
 	}
 
 	GetDistance = median;
+	uint16_t DistanceCorrected;
+	if(GetDistance > Param["H_level"] ){
+		DistanceCorrected = GetDistance - Param["H_level"];
+	} else {
+			DistanceCorrected = 0; // max level 
+	}
 
 	const int32_t lLevel = Param["L_level"];
 	if (lLevel <= 0) {
 		FinalLevelValue = 0u;
-	} else if (GetDistance >= static_cast<uint16_t>(lLevel)) {
+	} else if (DistanceCorrected >= static_cast<uint16_t>(lLevel)) {
 		FinalLevelValue = static_cast<uint16_t>(lLevel);
 	} else {
-		FinalLevelValue = static_cast<uint16_t>(static_cast<uint16_t>(lLevel) - GetDistance);
+		FinalLevelValue = static_cast<uint16_t>(static_cast<uint16_t>(lLevel) - DistanceCorrected);
 	}
 
 	GetLevel = FinalLevelValue;
@@ -140,9 +148,9 @@ void App::ClearPeriodicSamples()
 /* level calibration  */
 bool App::CalibrationRoutime (ButtonAssignment button){
 	static CalibrationMode Mode = {CalibrationMode::MODE_NONE};	
-	static uint32_t L_value =0;
-	static uint32_t M_value =0;
-	static uint32_t H_value =0;
+	static uint32_t L_value;
+	static uint32_t M_value;
+	static uint32_t H_value;
 
 	std::map<std::string,int32_t> CalibParams = {
         {"L_level", 0},
@@ -150,7 +158,6 @@ bool App::CalibrationRoutime (ButtonAssignment button){
         {"H_level", 0}
     };
 
-	param_storage.ReadRecord(CalibParams);
 
 	auto Event = button_monitor.GetLastEvent(static_cast<uint8_t>(button));
 
@@ -178,6 +185,11 @@ bool App::CalibrationRoutime (ButtonAssignment button){
 				led_controller.SetMode(LedController::Leds::Red,LedController::LedMode::On);
 				ClearPeriodicSamples();
 				DataTransmit::GetInstance().RadioTransmitOnOff(false);
+				/* load parmas */
+				param_storage.ReadRecord(CalibParams);
+				L_value = static_cast<uint32_t>(CalibParams["L_level"]);
+				M_value = static_cast<uint32_t>(CalibParams["M_level"]);	
+				H_value = static_cast<uint32_t>(CalibParams["H_level"]);
 				printf("Calibration mode started\n");
 				return true;
 			}
@@ -241,11 +253,13 @@ bool App::CalibrationRoutime (ButtonAssignment button){
 			}	
 
 			/* select mode */
-			if(button == ButtonAssignment::BUTTON_MODE_SELECT && Event == ButtonEvent::PRESSED) {
+			if(button == ButtonAssignment::BUTTON_MODE_SELECT && Event == ButtonEvent::HELD) {
 				/* L mode run - switch to M calibb  */
 				if(Mode == CalibrationMode::MODE_CALIBRATION_L){
 					Mode = CalibrationMode::MODE_CALIBRATION_M;
 					led_controller.SetMode(LedController::Leds::Green, LedController::LedMode::Blink);
+					led_controller.SetMode(LedController::Leds::Red,LedController::LedMode::On);
+					ClearPeriodicSamples();
 					printf("Switched to M level calibration\n");
 					return true;
 				}
@@ -254,6 +268,8 @@ bool App::CalibrationRoutime (ButtonAssignment button){
 					Mode = CalibrationMode::MODE_CALIBRATION_H;
 					led_controller.SetMode(LedController::Leds::Green, LedController::LedMode::Off);
 					led_controller.SetMode(LedController::Leds::Blue,LedController::LedMode::On);
+					led_controller.SetMode(LedController::Leds::Red,LedController::LedMode::On);
+					ClearPeriodicSamples();
 					printf("Switched to H level calibration\n");
 					return true;
 				}
@@ -262,6 +278,8 @@ bool App::CalibrationRoutime (ButtonAssignment button){
 					Mode = CalibrationMode::MODE_CALIBRATION_L;
 					led_controller.SetMode(LedController::Leds::Green, LedController::LedMode::On);
 					led_controller.SetMode(LedController::Leds::Blue,LedController::LedMode::Off);
+					led_controller.SetMode(LedController::Leds::Red,LedController::LedMode::On);
+					ClearPeriodicSamples();
 					printf("Switched to L level calibration\n");
 					return true;
 				}
@@ -306,6 +324,17 @@ void App::init()
 /* main app loop */
 void App::loop(){
 		bool PrevCalibrationRun=false;
+		bool ButtonPressed = false;
+
+		if(HAL_GPIO_ReadPin(BT_1_GPIO_Port, BT_1_Pin) == GPIO_PIN_RESET
+			|| HAL_GPIO_ReadPin(BT_2_GPIO_Port, BT_2_Pin) == GPIO_PIN_RESET
+			|| HAL_GPIO_ReadPin(BT_3_GPIO_Port, BT_3_Pin) == GPIO_PIN_RESET) {
+				ButtonPressed = true;
+		} else {	
+				ButtonPressed = false;				
+			}
+	
+
 	for(;;){
 
 		/* Kontrola stisknutých tlačítek */
@@ -314,7 +343,7 @@ void App::loop(){
 		if(button != ButtonAssignment::NO_BUTTON) {
 			printf("Button event: %d\n", static_cast<int>(button));
 			if(button_monitor.GetLastEvent(static_cast<uint8_t>(button))!= ButtonEvent::RELEASED){
-			CalibrationRun = CalibrationRoutime(button);
+			if((CalibrationRun = CalibrationRoutime(button))) led_controller.Run();
 			}
 		}
 		
@@ -326,15 +355,10 @@ void App::loop(){
 	
 		
 		/* measure  */
-		if(MeasureReq == true 
-			&& HAL_GPIO_ReadPin(BT_1_GPIO_Port, BT_1_Pin) == GPIO_PIN_SET
-			&& HAL_GPIO_ReadPin(BT_2_GPIO_Port, BT_2_Pin) == GPIO_PIN_SET
-			&& HAL_GPIO_ReadPin(BT_3_GPIO_Port, BT_3_Pin) == GPIO_PIN_SET) {
+		if(MeasureReq == true && ButtonPressed == false) {
 			MeasureReq = false;
 			PeriodicMeasure();
 		}
-
-	
 
 		/* Kontrola přijatých dat */
 		if(DataTransmit::DataAvailable && !CalibrationRun){
@@ -343,9 +367,9 @@ void App::loop(){
 				printf("Received Level Request\n");
 				led_controller.SetMode(LedController::Leds::Green, LedController::LedMode::OneShot);
 				uint16_t  status = 0;
-				if(FinalLevelValue >= Param["L_level"] ) status  |=LEVEL_L ;
-				if(FinalLevelValue > Param["M_level"]  && FinalLevelValue <  Param["L_level"]) status   |=LEVEL_UNDER_M ;
-				if(FinalLevelValue <= Param["H_level"] ) status  |=LEVEL_H ;
+				if(GetDistance >= Param["L_level"] ) status  |=LEVEL_L ;
+				if(GetDistance >= Param["M_level"]  && status == 0) status  |=LEVEL_UNDER_M ;
+				if(GetDistance <= Param["H_level"] ) status  |=LEVEL_H ;
 				printf("Measured level: %u cm status :%u\n", GetLevel, status );
 
 				std::vector<uint8_t> payload(sizeof(GetLevel) + sizeof(status));
@@ -389,7 +413,6 @@ void App::loop(){
 		}
 
 		/* led control */
-		
 		led_controller.Run();
 		#if WDT_ENABLE
 		HAL_IWDG_Refresh(&hiwdg);

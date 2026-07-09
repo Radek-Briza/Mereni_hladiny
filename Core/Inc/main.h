@@ -57,8 +57,7 @@ void Error_Handler(void);
 void SystemClock_Config(void);
 
 /* USER CODE BEGIN EFP */
-#define SLEEP_ENABLE 1
-#define WDT_ENABLE   1
+
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/

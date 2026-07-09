@@ -95,7 +95,7 @@ private:
   uint16_t  _triggerLength    = 10;       //  microSeconds
   float    _speedOfSound     = 340;      //  15°C  0%RH  Sea level
   uint32_t _lastTime = 0;
-  uint16_t _sampleInterval = 1000;       //  microSeconds
+  uint16_t _sampleInterval = 100;//1000;       //  microSeconds
 
   uint32_t _read();
   void     _insertSort(uint32_t * array, uint8_t size);
