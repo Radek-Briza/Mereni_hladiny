@@ -15,6 +15,8 @@ set(MX_Include_Dirs
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Inc
       ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src
     ${CMAKE_CURRENT_SOURCE_DIR}/../../App
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../SenzorLib/SRF05
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../SenzorLib/HX710
     ${CMAKE_CURRENT_SOURCE_DIR}/../../SubGHz_Phy/App
     ${CMAKE_CURRENT_SOURCE_DIR}/../../SubGHz_Phy/Target
      ${CMAKE_CURRENT_SOURCE_DIR}/../../Utilities/trace/adv_trace
@@ -40,7 +42,8 @@ set(MX_Application_Src
     ${CMAKE_CURRENT_SOURCE_DIR}/../../App/app.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../../App/DataTransmit.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../../App/Packet.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../App/SRF05.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../SenzorLib/SRF05/SRF05.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../SenzorLib/HX710/HX710.cpp    
     ${CMAKE_CURRENT_SOURCE_DIR}/../../App/FlashStorage.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/main.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../../App/LedDriver.cpp
