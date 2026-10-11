@@ -32,7 +32,7 @@ constexpr uint32_t LEVEL_L_CM =	85;
 constexpr uint32_t LEVEL_M_CM =	40;
 constexpr uint32_t LEVEL_H_CM =	5;
 constexpr uint16_t BATTERY_LOW_THRESHOLD = 3000; // 3.0V
-constexpr uint16_t BATTERY_HIGH_THRESHOLD = 4200; // 4.2V
+constexpr uint16_t BATTERY_HIGH_THRESHOLD = 4150; // 4.2V
 extern IWDG_HandleTypeDef hiwdg;
 
 
@@ -92,20 +92,15 @@ void  App::PeriodicMeasure(void) {
 	}
 
 	GetDistance = median;
-	uint16_t DistanceCorrected;
-	if(GetDistance > Param["H_level"] ){
-		DistanceCorrected = GetDistance - Param["H_level"];
-	} else {
-			DistanceCorrected = 0; // max level 
-	}
+	
 
 	const int32_t lLevel = Param["L_level"];
 	if (lLevel <= 0) {
 		FinalLevelValue = 0u;
-	} else if (DistanceCorrected >= static_cast<uint16_t>(lLevel)) {
+	} else if (GetDistance >= static_cast<uint16_t>(lLevel)) {
 		FinalLevelValue = 0;
 	} else {
-		FinalLevelValue = static_cast<uint16_t>(static_cast<uint16_t>(lLevel) - DistanceCorrected);
+		FinalLevelValue = static_cast<uint16_t>(static_cast<uint16_t>(lLevel) - GetDistance);
 	}
 
 	GetLevel = FinalLevelValue;

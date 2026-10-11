@@ -129,7 +129,7 @@ int main(void)
   }
   
   printf("-----------------------------\r\n");
-  printf("\rMereni hladiny ver 1.05 \r\n") ;
+  printf("\rMereni hladiny ver 1.06 \r\n") ;
   /* Infinite loop */
   App Application;
   Application.init();
